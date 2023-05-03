@@ -34,7 +34,9 @@ Road traffic accident data of 2017 to 2019 of Germany.
 
 <!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
-1. Example Issue [#1][i1]
-2. ...
+1. Download Data
+2. Create Data Preparation Pipeline 
+3. Match Datasets to each other
+4. Analyse Data
 
 [i1]: https://github.com/jvalue/2023-amse-template/issues/1
