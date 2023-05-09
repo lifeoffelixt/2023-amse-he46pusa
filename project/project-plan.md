@@ -23,7 +23,7 @@ Weather events on specific routes were studied using reanalysis data from all of
 
 * Metadata URL: https://unfallatlas.statistikportal.de/_opendata2022.html
 * Data URL:
-* 2017: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2018_EPSG25832_CSV.zip
+* 2017: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2017_EPSG25832_CSV.zip
 * 2018: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2018_EPSG25832_CSV.zip
 * 2019: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2019_EPSG25832_CSV.zip
 * Data Type: CSV/Zip
@@ -34,9 +34,9 @@ Road traffic accident data of 2017 to 2019 of Germany.
 
 <!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
-1. Download Data
-2. Create Data Preparation Pipeline 
-3. Match Datasets to each other
-4. Analyse Data
+1. Download Data [x]
+2. Create Data Preparation Pipeline [ ]
+3. Match Datasets to each other [ ]
+4. Analyse Data [ ]
 
 [i1]: https://github.com/jvalue/2023-amse-template/issues/1

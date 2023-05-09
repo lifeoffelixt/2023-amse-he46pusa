@@ -1,0 +1,54 @@
+pipeline WeatherData {
+    block WeatherExtractor  oftype HttpExtractor {
+        url: "https://www.mcloud.de/downloads/mcloud/96EA9CD1-0695-4461-90B1-BC6F6B0E0729/Resultat_HotSpot_Analyse_neu.csv";
+        }
+
+	block WeatherTextFileInterpreter oftype TextFileInterpreter {
+
+	}
+
+	block WeatherCSVInterpreter oftype CSVInterpreter {
+		delimiter: ';';
+	}
+
+	block WeatherHeaderWriter1 oftype CellWriter {
+        at:  cell B1;
+        write: "Latitude";
+    }
+
+
+    block WeatherHeaderWriter2 oftype CellWriter {
+        at:  cell C1;
+        write: "Longitude";
+    }
+
+	block WeatherTableInterpreter oftype TableInterpreter {
+		header: true;
+		columns: [
+			"Strecke" oftype text,
+			"Latitude" oftype decimal,
+			"Longitude" oftype decimal,
+			"Nebel" oftype decimal,
+			"Black Ice" oftype decimal,
+			"Neuschnee" oftype decimal,
+			"Gesamtschnee" oftype decimal,
+			"Niederschlag" oftype decimal,
+			"Wind" oftype decimal,
+			"Windböen" oftype decimal,
+			"Gesamt" oftype decimal
+		];
+	}
+
+	block WeatherLoader oftype SQLiteLoader {
+		table: "WeatherData";
+		file: "../data/data.sqlite";
+	}
+
+    WeatherExtractor
+        -> WeatherTextFileInterpreter
+        -> WeatherCSVInterpreter
+        -> WeatherHeaderWriter1
+        -> WeatherHeaderWriter2
+        -> WeatherTableInterpreter
+        -> WeatherLoader;
+}
