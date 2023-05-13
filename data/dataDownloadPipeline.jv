@@ -75,6 +75,17 @@ pipeline Crash2017Data {
 		delimiter: ';';
 	}
 
+	block Crash2017HeaderWriter1 oftype CellWriter {
+        at:  cell X1;
+        write: "Latitude";
+    }
+
+
+    block Crash2017HeaderWriter2 oftype CellWriter {
+        at:  cell W1;
+        write: "Longitude";
+    }
+
 	block Crash2017TableInterpreter oftype TableInterpreter {
 		header: true;
 		columns: [
@@ -100,8 +111,8 @@ pipeline Crash2017Data {
 			"STRZUSTAND" oftype integer,
 			"LINREFX" oftype decimal,
 			"LINREFY" oftype decimal,
-			"XGCSWGS84" oftype decimal,
-			"YGCSWGS84" oftype decimal
+			"Longitude" oftype decimal,
+			"Latitude" oftype decimal
 		];
 	}
 
@@ -115,6 +126,8 @@ pipeline Crash2017Data {
         -> Crash2017FilePicker
         -> Crash2017TextFileInterpreter
         -> Crash2017CSVInterpreter
+		-> Crash2017HeaderWriter1
+		-> Crash2017HeaderWriter2
         -> Crash2017TableInterpreter
         -> Crash2017Loader;
 }
@@ -141,6 +154,17 @@ pipeline Crash2018Data {
 		delimiter: ';';
 	}
 
+	block Crash2018HeaderWriter1 oftype CellWriter {
+        at:  cell X1;
+        write: "Latitude";
+    }
+
+
+    block Crash2018HeaderWriter2 oftype CellWriter {
+        at:  cell W1;
+        write: "Longitude";
+    }
+
 	block Crash2018TableInterpreter oftype TableInterpreter {
 		header: true;
 		columns: [
@@ -166,8 +190,8 @@ pipeline Crash2018Data {
             "STRZUSTAND" oftype integer,
             "LINREFX" oftype decimal,
             "LINREFY" oftype decimal,
-            "XGCSWGS84" oftype decimal,
-            "YGCSWGS84" oftype decimal
+            "Longitude" oftype decimal,
+            "Latitude" oftype decimal
 		];
 	}
 
@@ -181,6 +205,8 @@ pipeline Crash2018Data {
         -> Crash2018FilePicker
         -> Crash2018TextFileInterpreter
         -> Crash2018CSVInterpreter
+		-> Crash2018HeaderWriter1
+		-> Crash2018HeaderWriter2
         -> Crash2018TableInterpreter
         -> Crash2018Loader;
 }
@@ -207,6 +233,17 @@ pipeline Crash2019Data {
 		delimiter: ';';
 	}
 
+	block Crash2019HeaderWriter1 oftype CellWriter {
+        at:  cell W1;
+        write: "Latitude";
+    }
+
+
+    block Crash2019HeaderWriter2 oftype CellWriter {
+        at:  cell V1;
+        write: "Longitude";
+    }
+
 	block Crash2019TableInterpreter oftype TableInterpreter {
 		header: true;
 		columns: [
@@ -231,8 +268,8 @@ pipeline Crash2019Data {
 			"IstSonstige" oftype integer,
 			"LINREFX" oftype decimal,
 			"LINREFY" oftype decimal,
-			"XGCSWGS84" oftype decimal,
-			"YGCSWGS84" oftype decimal,
+			"Longitude" oftype decimal,
+			"Latitude" oftype decimal,
 			"STRZUSTAND" oftype integer
 		];
 	}
@@ -247,6 +284,8 @@ pipeline Crash2019Data {
         -> Crash2019FilePicker
         -> Crash2019TextFileInterpreter
         -> Crash2019CSVInterpreter
+		-> Crash2019HeaderWriter1
+		-> Crash2019HeaderWriter2
         -> Crash2019TableInterpreter
         -> Crash2019Loader;
 }
