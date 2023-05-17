@@ -25,7 +25,7 @@ column_types = {
 }
 
 # SQLite database connection
-engine = create_engine("sqlite:///exercises/airports.sqlite")
+engine = create_engine("sqlite:///airports.sqlite")
 
 # Store the DataFrame in the SQLite database with assigned types
 df.to_sql("airports", engine, if_exists="replace", index=False, dtype=column_types)
