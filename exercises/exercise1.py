@@ -18,7 +18,7 @@ column_types = {
     "column_7": Float(),
     "column_8": Float(),
     "column_9": Integer(),
-    "column_10": Integer(),
+    "column_10": Float(),
     "column_11": Text(),
     "column_12": Text(),
     "geo_punkt": Text()
