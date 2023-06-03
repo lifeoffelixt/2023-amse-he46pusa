@@ -14,13 +14,14 @@ It analyses whether highway segments that are particularly exposed to extreme we
 
 <!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
 
-### Datasource1: ExampleSource
+### Datasource1: Highway Weather Data
 * Metadata URL: https://mobilithek.info/offers/-3534538293975156153
 * Data URL: https://www.mcloud.de/downloads/mcloud/96EA9CD1-0695-4461-90B1-BC6F6B0E0729/Resultat_HotSpot_Analyse_neu.csv
 * Data Type: CSV
 
 Weather events on specific routes were studied using reanalysis data from all of Germany from Dec. 1, 2017-Nov. 30, 2019. The weather values of 3160 points with 1 km distance were read from the data and averaged or summed up, depending on the parameter. The values were normalized and the highest was given the value 100, the lowest the value 0.
 
+### Datasource2: CrashData 
 * Metadata URL: https://unfallatlas.statistikportal.de/_opendata2022.html
 * Data URL:
 * 2017: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2017_EPSG25832_CSV.zip
@@ -29,14 +30,3 @@ Weather events on specific routes were studied using reanalysis data from all of
 * Data Type: CSV/Zip
 
 Road traffic accident data of 2017 to 2019 of Germany.
-
-## Work Packages
-
-<!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
-
-1. Download Data [x]
-2. Create Data Preparation Pipeline [ ]
-3. Match Datasets to each other [ ]
-4. Analyse Data [ ]
-
-[i1]: https://github.com/jvalue/2023-amse-template/issues/1
