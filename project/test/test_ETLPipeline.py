@@ -258,8 +258,8 @@ def test_weatherDataID_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("Strecke+ID", "TEXT"),
-        ("StreckeID", "BIGINT"),
+        ("StreckeID", "TEXT"),
+        ("IDperStrecke", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -439,7 +439,7 @@ def test_crashData_columns():
         ("ULICHTVERH", "FLOAT"),
         ("IstGkfz", "FLOAT"),
         ("Strecke", "TEXT"),
-        ("Strecke+ID", "TEXT")
+        ("StreckeID", "TEXT")
     ]
 
     # Check if the columns and their data types match the expected ones
@@ -464,8 +464,8 @@ def test_weatherCrashData_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("Strecke+ID", "TEXT"),
-        ("StreckeID", "BIGINT"),
+        ("StreckeID", "TEXT"),
+        ("IDperStrecke", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -477,7 +477,7 @@ def test_weatherCrashData_columns():
         ("Windböen", "FLOAT"),
         ("Gesamt", "FLOAT"),
         ("CrashCount", "FLOAT"),
-        ("NormalizedCrashCount", "FLOAT")
+        ("NormalizedCrash", "FLOAT")
     ]
 
     # Check if the columns and their data types match the expected ones
@@ -502,8 +502,8 @@ def test_weatherCrashDataNormalized_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("Strecke+ID", "TEXT"),
-        ("StreckeID", "BIGINT"),
+        ("StreckeID", "TEXT"),
+        ("IDperStrecke", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -515,7 +515,7 @@ def test_weatherCrashDataNormalized_columns():
         ("Windböen", "FLOAT"),
         ("Gesamt", "FLOAT"),
         ("CrashCount", "FLOAT"),
-        ("NormalizedCrashCount", "FLOAT")
+        ("NormalizedCrash", "FLOAT")
     ]
 
 

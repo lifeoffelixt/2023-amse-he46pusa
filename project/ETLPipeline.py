@@ -102,16 +102,16 @@ def preprocess_weather_data(location: str = 'sqlite:///data/data.sqlite') -> pd.
     # Rename columns to make them easier to read
     weatherData = weatherData.rename(columns={'Lon [°]': 'Longitude', 'Lat [°]': 'Latitude'})
     # Generate artificial ID within each 'Strecke' group
-    weatherData['StreckeID'] = weatherData.groupby('Strecke').cumcount() + 1
+    weatherData['IDperStrecke'] = weatherData.groupby('Strecke').cumcount() + 1
 
     # Create new column with values combining 'Strecke' and 'UniqueID'
-    weatherData['Strecke+ID'] = weatherData['Strecke'] + '_' + weatherData['StreckeID'].astype(str)
+    weatherData['StreckeID'] = weatherData['Strecke'] + '_' + weatherData['IDperStrecke'].astype(str)
 
-    # Move 'Strecke+ID' column to the second position
-    weatherData.insert(1, 'Strecke+ID', weatherData.pop('Strecke+ID'))
+    # Move 'StreckeID' column to the second position
+    weatherData.insert(1, 'StreckeID', weatherData.pop('StreckeID'))
 
-    # Move 'StreckeID' column to the third position
-    weatherData.insert(2, 'StreckeID', weatherData.pop('StreckeID'))
+    # Move 'IDperStrecke' column to the third position
+    weatherData.insert(2, 'IDperStrecke', weatherData.pop('IDperStrecke'))
 
     # return weatherData
     return weatherData
@@ -189,7 +189,7 @@ def assign_crash_to_weather_data(threshold_distance: int = 600, location: str = 
         # Assign the corresponding Strecke value if the closest distance is within the threshold
         if closest_distance <= threshold_distance:
             strecke_value = weatherData.loc[closest_weather_idx, 'Strecke']
-            streckeID_value = weatherData.loc[closest_weather_idx, 'Strecke+ID']
+            streckeID_value = weatherData.loc[closest_weather_idx, 'StreckeID']
         else:
             strecke_value = None
             streckeID_value = None
@@ -199,7 +199,7 @@ def assign_crash_to_weather_data(threshold_distance: int = 600, location: str = 
 
     # Assign the calculated Strecke values to a new column in crashData
     crashData['Strecke'] = strecke_values
-    crashData['Strecke+ID'] = streckeID_values
+    crashData['StreckeID'] = streckeID_values
 
     return crashData
 
@@ -218,9 +218,9 @@ def combine_weather_and_crash_data(location: str = 'sqlite:///data/data.sqlite')
     weatherData = read_table_from_sqlite('weatherDataID', location)
     crashData = read_table_from_sqlite("crashData", location)
 
-    crashDataGrouped = crashData.groupby(['Strecke', 'Strecke+ID']).size().reset_index(name='CrashCount')
+    crashDataGrouped = crashData.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCount')
     # Perform a left join on "Strecke" and "StreckeID"
-    combinedData = weatherData.merge(crashDataGrouped, on=['Strecke', 'Strecke+ID'], how='left')
+    combinedData = weatherData.merge(crashDataGrouped, on=['Strecke', 'StreckeID'], how='left')
 
     return combinedData
 
@@ -233,10 +233,10 @@ def add_column_with_normalized_crash_values(combinedData: pd.DataFrame) -> pd.Da
     max_count = combinedData['CrashCount'].max()
 
     # Normalize the "Count" values to a range of 0 to 100
-    combinedData['NormalizedCrashCount'] = (combinedData['CrashCount'] - min_count) / (max_count - min_count) * 100
+    combinedData['NormalizedCrash'] = (combinedData['CrashCount'] - min_count) / (max_count - min_count) * 100
 
     # Round the normalized values to at most 1 decimal point
-    combinedData['NormalizedCrashCount'] = combinedData['NormalizedCrashCount'].round(decimals=1)
+    combinedData['NormalizedCrash'] = combinedData['NormalizedCrash'].round(decimals=1)
 
     return combinedData
 
@@ -244,7 +244,7 @@ def add_column_with_normalized_crash_values(combinedData: pd.DataFrame) -> pd.Da
 def normalize_per_Route(location: str = 'sqlite:///data/data.sqlite') -> pd.DataFrame:
     weatherCrashData = read_table_from_sqlite('weatherCrashData', location)
     # Define the columns to be normalized
-    columns_to_normalize = ['Nebel', 'Black Ice', 'Neuschnee', 'Gesamtschnee', 'Niederschlag', 'Wind', 'Windböen', 'Gesamt', 'NormalizedCrashCount']
+    columns_to_normalize = ['Nebel', 'Black Ice', 'Neuschnee', 'Gesamtschnee', 'Niederschlag', 'Wind', 'Windböen', 'Gesamt', 'NormalizedCrash']
 
     # Create a new dataframe to store the normalized data
     WeatherCrashDataNormalized = weatherCrashData.copy()
