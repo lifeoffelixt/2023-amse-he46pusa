@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create a Conda environment from conda.yaml
-conda env create --name testing_SAMSE_env --file conda.yaml
+conda env create --name testing_SAMSE_env --file project/conda.yaml
 
 # Activate the Conda environment
 conda activate testing_SAMSE_env
@@ -10,7 +10,7 @@ conda activate testing_SAMSE_env
 pip install pytest
 
 # Run the pytest script
-python -m pytest tests/test_dataDownloadFilterPipeline.py
+python -m pytest project/test/test_ETLPipeline.py -v
 
 # Deactivate the Conda environment
 conda deactivate
