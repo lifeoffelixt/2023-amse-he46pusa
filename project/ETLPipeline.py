@@ -102,16 +102,16 @@ def preprocess_weather_data(location: str = 'sqlite:///data/data.sqlite') -> pd.
     # Rename columns to make them easier to read
     weatherData = weatherData.rename(columns={'Lon [°]': 'Longitude', 'Lat [°]': 'Latitude'})
     # Generate artificial ID within each 'Strecke' group
-    weatherData['UniqueID'] = weatherData.groupby('Strecke').cumcount() + 1
+    weatherData['StreckeID'] = weatherData.groupby('Strecke').cumcount() + 1
 
     # Create new column with values combining 'Strecke' and 'UniqueID'
-    weatherData['StreckeID'] = weatherData['Strecke'] + '_' + weatherData['UniqueID'].astype(str)
+    weatherData['Strecke+ID'] = weatherData['Strecke'] + '_' + weatherData['StreckeID'].astype(str)
 
-    # Move 'StreckeID' column to the second position
-    weatherData.insert(1, 'StreckeID', weatherData.pop('StreckeID'))
+    # Move 'Strecke+ID' column to the second position
+    weatherData.insert(1, 'Strecke+ID', weatherData.pop('Strecke+ID'))
 
-    # Drop the 'UniqueID' column
-    weatherData.drop('UniqueID', axis=1, inplace=True)
+    # Move 'StreckeID' column to the third position
+    weatherData.insert(2, 'StreckeID', weatherData.pop('StreckeID'))
 
     # return weatherData
     return weatherData
@@ -189,7 +189,7 @@ def assign_crash_to_weather_data(threshold_distance: int = 600, location: str = 
         # Assign the corresponding Strecke value if the closest distance is within the threshold
         if closest_distance <= threshold_distance:
             strecke_value = weatherData.loc[closest_weather_idx, 'Strecke']
-            streckeID_value = weatherData.loc[closest_weather_idx, 'StreckeID']
+            streckeID_value = weatherData.loc[closest_weather_idx, 'Strecke+ID']
         else:
             strecke_value = None
             streckeID_value = None
@@ -199,7 +199,7 @@ def assign_crash_to_weather_data(threshold_distance: int = 600, location: str = 
 
     # Assign the calculated Strecke values to a new column in crashData
     crashData['Strecke'] = strecke_values
-    crashData['StreckeID'] = streckeID_values
+    crashData['Strecke+ID'] = streckeID_values
 
     return crashData
 
@@ -218,9 +218,9 @@ def combine_weather_and_crash_data(location: str = 'sqlite:///data/data.sqlite')
     weatherData = read_table_from_sqlite('weatherDataID', location)
     crashData = read_table_from_sqlite("crashData", location)
 
-    crashDataGrouped = crashData.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCount')
+    crashDataGrouped = crashData.groupby(['Strecke', 'Strecke+ID']).size().reset_index(name='CrashCount')
     # Perform a left join on "Strecke" and "StreckeID"
-    combinedData = weatherData.merge(crashDataGrouped, on=['Strecke', 'StreckeID'], how='left')
+    combinedData = weatherData.merge(crashDataGrouped, on=['Strecke', 'Strecke+ID'], how='left')
 
     return combinedData
 

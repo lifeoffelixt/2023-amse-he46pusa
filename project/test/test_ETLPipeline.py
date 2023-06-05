@@ -258,7 +258,8 @@ def test_weatherDataID_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("StreckeID", "TEXT"),
+        ("Strecke+ID", "TEXT"),
+        ("StreckeID", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -438,7 +439,7 @@ def test_crashData_columns():
         ("ULICHTVERH", "FLOAT"),
         ("IstGkfz", "FLOAT"),
         ("Strecke", "TEXT"),
-        ("StreckeID", "TEXT")
+        ("Strecke+ID", "TEXT")
     ]
 
     # Check if the columns and their data types match the expected ones
@@ -463,7 +464,8 @@ def test_weatherCrashData_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("StreckeID", "TEXT"),
+        ("Strecke+ID", "TEXT"),
+        ("StreckeID", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -500,7 +502,8 @@ def test_weatherCrashDataNormalized_columns():
     # Define the expected column names and their corresponding data types
     expected_columns = [
         ("Strecke", "TEXT"),
-        ("StreckeID", "TEXT"),
+        ("Strecke+ID", "TEXT"),
+        ("StreckeID", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
