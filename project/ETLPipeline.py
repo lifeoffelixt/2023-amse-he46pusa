@@ -101,17 +101,21 @@ def preprocess_weather_data(location: str = 'sqlite:///data/data.sqlite') -> pd.
 
     # Rename columns to make them easier to read
     weatherData = weatherData.rename(columns={'Lon [°]': 'Longitude', 'Lat [°]': 'Latitude'})
+
+    # Remvove Route from Strecke
+    weatherData['Strecke'] = weatherData['Strecke'].str.replace('Route_', '')
+
     # Generate artificial ID within each 'Strecke' group
-    weatherData['IDperStrecke'] = weatherData.groupby('Strecke').cumcount() + 1
+    weatherData['Kilometer'] = weatherData.groupby('Strecke').cumcount() + 1
 
     # Create new column with values combining 'Strecke' and 'UniqueID'
-    weatherData['StreckeID'] = weatherData['Strecke'] + '_' + weatherData['IDperStrecke'].astype(str)
+    weatherData['StreckeID'] = weatherData['Strecke'] + '_' + weatherData['Kilometer'].astype(str)
 
     # Move 'StreckeID' column to the second position
     weatherData.insert(1, 'StreckeID', weatherData.pop('StreckeID'))
 
-    # Move 'IDperStrecke' column to the third position
-    weatherData.insert(2, 'IDperStrecke', weatherData.pop('IDperStrecke'))
+    # Move 'Kilometer' column to the third position
+    weatherData.insert(2, 'Kilometer', weatherData.pop('Kilometer'))
 
     # return weatherData
     return weatherData
@@ -305,6 +309,11 @@ def calculate_distance(coords1: np.array, coords2: np.array) -> np.array:
     return distance
 
 
+def store_transformed_data_in_own_database(org_location: str = 'sqlite:///data/data.sqlite', store_location: str = 'sqlite:///data/data_for_app.sqlite') -> None:
+    data = read_table_from_sqlite('weatherCrashDataNormalized', org_location)
+    data.to_sql('weatherCrashDataNormalized', store_location, if_exists='replace', index=False)
+
+
 def print_message(message: str) -> None:
     print('------------------')
     print(message)
@@ -315,8 +324,10 @@ def main(testing: bool = False) -> None:
     print_message(f'Testing: {testing}')
     if testing:
         location = 'sqlite:///project/test/test_data.sqlite'
+        final_location = 'sqlite:///project/test/test_data_for_app.sqlite'
     else:
         location = 'sqlite:///data/data.sqlite'
+        final_location = 'sqlite:///data/data_for_app.sqlite'
 
     
     print_message('Begin Extracting')
@@ -324,18 +335,20 @@ def main(testing: bool = False) -> None:
             "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2017_EPSG25832_CSV.zip",
             "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2018_EPSG25832_CSV.zip",
             "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2019_EPSG25832_CSV.zip"]
+    
     if not table_exists("weatherData", location):
         load("weatherData", extract(urls[0], testing), location)
 
     years = [2017, 2018, 2019]
-    #for i, year in tqdm(enumerate(years), total=len(years), desc="Extracting Years"):
-    for i, year in enumerate(years):
+    for i, year in tqdm(enumerate(years), total=len(years), desc="Extracting Years"):
+    #for i, year in enumerate(years):
         if not table_exists("crashData"+str(year), location):
             load("crashData"+str(year), extract(urls[i+1], testing), location)
     print_message('Finished Extracting')
     
     print_message('Begin Transforming')
     transform(location)
+    store_transformed_data_in_own_database(location, final_location)
     print_message('Finished Transforming')
 
 

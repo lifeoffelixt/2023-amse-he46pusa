@@ -25,8 +25,6 @@ def remove_test_file():
         os.remove('project/test/test_data.sqlite')
 
 def test_tables_exist():
-
-
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite') 
 
@@ -259,7 +257,7 @@ def test_weatherDataID_columns():
     expected_columns = [
         ("Strecke", "TEXT"),
         ("StreckeID", "TEXT"),
-        ("IDperStrecke", "BIGINT"),
+        ("Kilometer", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -465,7 +463,7 @@ def test_weatherCrashData_columns():
     expected_columns = [
         ("Strecke", "TEXT"),
         ("StreckeID", "TEXT"),
-        ("IDperStrecke", "BIGINT"),
+        ("Kilometer", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -503,7 +501,7 @@ def test_weatherCrashDataNormalized_columns():
     expected_columns = [
         ("Strecke", "TEXT"),
         ("StreckeID", "TEXT"),
-        ("IDperStrecke", "BIGINT"),
+        ("Kilometer", "BIGINT"),
         ("Latitude", "FLOAT"),
         ("Longitude", "FLOAT"),
         ("Nebel", "FLOAT"),
@@ -526,3 +524,7 @@ def test_weatherCrashDataNormalized_columns():
 
     # Close the database connection
     conn.close()
+
+
+def test_final_database_exists():
+    assert os.path.exists('project/test/test_data.sqlite'), "The final database file does not exist."
