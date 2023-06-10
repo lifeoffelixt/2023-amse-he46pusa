@@ -1,6 +1,6 @@
 # AMSE/SAKI 2023 Template Project
 
-[![Project Pipeline](https://github.com/lifeoffelixt/2023-amse-he46pusa/actions/workflows/project-pipeline.yml/badge.svg)](https://github.com/lifeoffelixt/2023-amse-he46pusa/actions/workflows/project-pipeline.yml)
+[![Project Pipeline](https://github.com/lifeoffelixt/2023-amse-he46pusa/actions/workflows/project-pipeline.yml/badge.svg?branch=main)](https://github.com/lifeoffelixt/2023-amse-he46pusa/actions/workflows/project-pipeline.yml)
 
 This template project provides some structure for your open data project in the AMSE/SAKI module.
 This repository contains (a) a data science project that is developed by the student over the course of the semester, and (b) the exercises that are submitted over the course of the semester.
