@@ -1,0 +1,19 @@
+name: test_project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run file
+        run: |
+          chmod +x ./project/test.sh
+          ./project/test.sh

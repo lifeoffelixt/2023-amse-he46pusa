@@ -34,7 +34,7 @@ def transform(location: str = 'sqlite:///data/data.sqlite') -> None:
             load("crashDataNearby" + str(year), crashData , location)
 
     if not table_exists("crashData", location):
-        load("crashData", assign_crash_to_weather_data(600,location), location)
+        load("crashData", assign_crash_to_weather_data(600, location), location)
 
     if not table_exists("weatherCrashData", location):
         weatherCrashData = combine_weather_and_crash_data(location)
