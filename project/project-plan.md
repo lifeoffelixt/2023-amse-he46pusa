@@ -3,8 +3,7 @@
 ## Summary
 
 <!-- Describe your data science project in max. 5 sentences. -->
-Analysis of weather events on German highways and accidents in 2018-19. Done via a streamlit app
-You can run it via the command `streamlit run app.py` in the terminal. The file `app.py` can be found in the folder `project/streamlit` 
+Analysis of weather events on German highways and accidents in 2018-19. 
 
 ## Rationale
 

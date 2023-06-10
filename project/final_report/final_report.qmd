@@ -1,0 +1,124 @@
+---
+title: "Does Weather has an significant impact on the number of highway traffic accidents?"
+subtitle: "A SAMSE project"
+title-block-style: default
+author: "Felix Büppelmann"
+date: "2023-06-10"
+format:
+  html: default
+  ipynb: default
+  pdf:
+    toc: false
+    number-sections: true
+    colorlinks: true
+execute:
+  echo: false
+jupyter: samse_3.11
+---
+
+## Summary
+
+Analysis of weather events on German highways and accidents in 2018-19.
+
+## Rationale
+
+It analyses whether highway segments that are particularly exposed to extreme weather events result in more car crashes than usual. 
+
+## Datasources
+
+### Highway Weather Data
+* Metadata: [URL](https://mobilithek.info/offers/-3534538293975156153)
+* Data: [URL](https://www.mcloud.de/downloads/mcloud/96EA9CD1-0695-4461-90B1-BC6F6B0E0729/>Resultat_HotSpot_Analyse_neu.csv)
+* Data Type: CSV
+* Description: Weather events on specific routes were studied using reanalysis data from all of Germany from Dec. 1, 2017-Nov. 30, 2019. The weather values of 3160 points with 1 km distance were read from the data and averaged or summed up, depending on the parameter. The values were normalized and the highest was given the value 100, the lowest the value 0.
+
+### CrashData 
+* Metadata: [URL](https://unfallatlas.statistikportal.de/_opendata2022.html)
+* Data: [2017](https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2017_EPSG25832_CSV.zip) [2018](https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2018_EPSG25832_CSV.zip) [2019](https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2019_EPSG25832_CSV.zip)
+* Data Type: ZIP/CSV
+* Description: Road traffic accident data of 2017 to 2019 of Germany.
+
+## Transformations
+
+1. Preporcessing of the weather data
+    * Give each weather measure point a unique ID
+    * As the measure points are distributed one kilometer apart from each other, each points gets an kilomter marker
+2. Preprocessing of the crash data
+    * Dropping rows with irrelevant data (turn accidents, bike accidents, etc.)
+    * Drop columns with irrelevant data
+3. Connect the crash data with the weather data
+    * For each crash, find the closest weather measure point (Treshold: 600m)
+      + Drop rows where no point is within the treshold
+      + If there are multiple points within the treshold, select the one closest
+    * Merge crash data to the weather data
+4. Normalize the combined data per Route
+
+## Analysis
+
+```{python}
+#| context: setup
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import os
+```
+
+::: {.content-hidden when-format="pdf"}
+```{python}
+# Load weatherCrashDataNormalized
+weatherCrashDataNormalized = pd.read_sql_table('weatherCrashDataNormalized', 'sqlite:///data_for_app.sqlite')
+
+# Get unique values of Strecke
+strecke_values = weatherCrashDataNormalized['Strecke'].unique()
+
+# Create dropdown chooser
+selected_strecke = 'All'  # Set default value for selected_strecke
+
+# Filter the data for the selected Strecke
+if selected_strecke == 'All':
+    filtered_data = weatherCrashDataNormalized
+    zoom = 4.5
+    color_column = 'Strecke'
+    selected_checkboxes = []  # Initialize an empty list for selected checkboxes
+
+# Create scatter plot
+fig = go.Figure()
+
+# Loop through each unique route (Strecke) and add a trace for each
+for strecke in strecke_values:
+    strecke_data = filtered_data[filtered_data['Strecke'] == strecke]
+    fig.add_trace(go.Scattermapbox(
+        lat=strecke_data['Latitude'],
+        lon=strecke_data['Longitude'],
+        text=strecke_data[['Strecke', 'Kilometer', 'NormalizedCrash']],
+        hovertemplate='<b>Strecke:</b> %{text[0]}<br><b>Kilometer:</b> %{text[1]}<br><b>NormalizedCrash:</b> %{text[2]}<extra></extra>',
+        name=strecke,  # Set the name for the legend
+        marker=dict(size=8),
+        mode='markers',
+        showlegend=True
+    ))
+
+# Update map layout
+fig.update_layout(
+    mapbox_style='carto-positron',
+    mapbox_zoom=zoom,
+    mapbox_center={'lat': filtered_data['Latitude'].mean(), 'lon': filtered_data['Longitude'].mean()},
+    margin=dict(l=0, r=0, t=0, b=0),
+    height=400,  # Set map height
+    width=600  # Set map width
+)
+
+# Display the figure
+fig.show()
+
+if not os.path.exists("images"):
+    os.mkdir("images")
+  
+fig.write_image("images/overall_map.png")
+```
+::: 
+
+::: {.content-hidden when-format="html"}
+
+![Overall_map](final_report_files/images/overall_map.png)
+:::
