@@ -38,7 +38,7 @@ def test_tables_exist():
     required_tables = [
         'weatherData',
         'weatherDataID',
-        'crashData2017',
+        'crashData2020',
         'crashData2018',
         'crashData2019',
         'crashDataNearby2017',

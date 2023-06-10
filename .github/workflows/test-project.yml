@@ -2,6 +2,9 @@ name: test_project
 
 on:
   push:
+    paths:
+      - 'data/**'
+      - 'project/**'
     branches:
       - main
 
