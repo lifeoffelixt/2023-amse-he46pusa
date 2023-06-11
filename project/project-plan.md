@@ -22,7 +22,7 @@ It analyses whether highway segments that are particularly exposed to extreme we
 Weather events on specific routes were studied using reanalysis data from all of Germany from Dec. 1, 2017-Nov. 30, 2019. The weather values of 3160 points with 1 km distance were read from the data and averaged or summed up, depending on the parameter. The values were normalized and the highest was given the value 100, the lowest the value 0.
 
 ### Datasource2: CrashData 
-* Metadata URL: https://unfallatlas.statistikportal.de/_opendata2022.html
+* Metadata URL: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/ 
 * Data URL:
 * 2017: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2017_EPSG25832_CSV.zip
 * 2018: https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2018_EPSG25832_CSV.zip
