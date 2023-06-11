@@ -34,7 +34,16 @@ def transform(location: str = 'sqlite:///data/data.sqlite') -> None:
             load("crashDataNearby" + str(year), crashData , location)
 
     if not table_exists("crashData", location):
-        load("crashData", assign_crash_to_weather_data(600, location), location)
+        load("crashData", assign_crash_to_weather_data(0, 600, location), location)
+
+    if not table_exists("crashDataWet", location):
+        load("crashDataWet", filter_wet_snow_crash_data(1, location), location)
+    
+    if not table_exists("crashDataSnow", location):
+        load("crashDataSnow", filter_wet_snow_crash_data(2, location), location)
+    
+    if not table_exists("crashDataWetSnow", location):
+        load("crashDataWetSnow", filter_wet_snow_crash_data(3, location), location)
 
     if not table_exists("weatherCrashData", location):
         weatherCrashData = combine_weather_and_crash_data(location)
@@ -173,7 +182,7 @@ def connect_crash_data_with_weather_data(name: str,
     return crashData[np.min(distances, axis=1) <= threshold_distance]
     
 
-def assign_crash_to_weather_data(threshold_distance: int = 600, location: str = 'sqlite:///data/data.sqlite') -> pd.DataFrame:
+def assign_crash_to_weather_data(filter: int = 0, threshold_distance: int = 600, location: str = 'sqlite:///data/data.sqlite') -> pd.DataFrame:
     crashData = concat_crash_data(location)
     weatherData = read_table_from_sqlite('weatherDataID', location)
 
@@ -217,14 +226,35 @@ def concat_crash_data(location: str = 'sqlite:///data/data.sqlite') -> pd.DataFr
     except:
         raise ValueError("Crash data from one year not found.")
 
+def filter_wet_snow_crash_data(filter: int = 0, location: str = 'sqlite:///data/data.sqlite'):
+    crashData = read_table_from_sqlite("crashData", location)
+    if filter == 1:
+         return crashData[crashData['STRZUSTAND'] == 1]
+    elif filter == 2:
+        return crashData[crashData['STRZUSTAND'] == 2]
+    elif filter == 3:
+        return crashData[crashData['STRZUSTAND'] != 0]
+    else:
+        return crashData
+
 
 def combine_weather_and_crash_data(location: str = 'sqlite:///data/data.sqlite') -> pd.DataFrame:
     weatherData = read_table_from_sqlite('weatherDataID', location)
     crashData = read_table_from_sqlite("crashData", location)
+    crashDataWet = read_table_from_sqlite("crashDataWet", location)
+    crashDataSnow = read_table_from_sqlite("crashDataSnow", location)
+    crashDataWetSnow = read_table_from_sqlite("crashDataWetSnow", location)
 
     crashDataGrouped = crashData.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCount')
+    crashDataWetGrouped = crashDataWet.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCountWet')
+    crashDataSnowGrouped = crashDataSnow.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCountSnow')
+    crashDataWetSnowGrouped = crashDataWetSnow.groupby(['Strecke', 'StreckeID']).size().reset_index(name='CrashCountWetSnow')
+
     # Perform a left join on "Strecke" and "StreckeID"
     combinedData = weatherData.merge(crashDataGrouped, on=['Strecke', 'StreckeID'], how='left')
+    combinedData = combinedData.merge(crashDataWetGrouped, on=['Strecke', 'StreckeID'], how='left')
+    combinedData = combinedData.merge(crashDataSnowGrouped, on=['Strecke', 'StreckeID'], how='left')
+    combinedData = combinedData.merge(crashDataWetSnowGrouped, on=['Strecke', 'StreckeID'], how='left')
 
     return combinedData
 
@@ -232,15 +262,31 @@ def combine_weather_and_crash_data(location: str = 'sqlite:///data/data.sqlite')
 def add_column_with_normalized_crash_values(combinedData: pd.DataFrame) -> pd.DataFrame:
     # Fill missing values with 0
     combinedData['CrashCount'] = combinedData['CrashCount'].fillna(0)
+    combinedData['CrashCountWet'] = combinedData['CrashCountWet'].fillna(0)
+    combinedData['CrashCountSnow'] = combinedData['CrashCountSnow'].fillna(0)
+    combinedData['CrashCountWetSnow'] = combinedData['CrashCountWetSnow'].fillna(0)
+
     # Calculate the minimum and maximum values of "Count"
-    min_count = combinedData['CrashCount'].min()
-    max_count = combinedData['CrashCount'].max()
+    minCount = combinedData['CrashCount'].min()
+    maxCount = combinedData['CrashCount'].max()
+    minCountWet = combinedData['CrashCountWet'].min()
+    maxCountWet = combinedData['CrashCountWet'].max()
+    minCountSnow = combinedData['CrashCountSnow'].min()
+    maxCountSnow = combinedData['CrashCountSnow'].max()
+    minCountWetSnow = combinedData['CrashCountWetSnow'].min()
+    maxCountWetSnow = combinedData['CrashCountWetSnow'].max()
 
     # Normalize the "Count" values to a range of 0 to 100
-    combinedData['NormalizedCrash'] = (combinedData['CrashCount'] - min_count) / (max_count - min_count) * 100
+    combinedData['NormalizedCrash'] = (combinedData['CrashCount'] - minCount) / (maxCount - minCount) * 100
+    combinedData['NormalizedCrashWet'] = (combinedData['CrashCountWet'] - minCountWet) / (maxCountWet - minCountWet) * 100
+    combinedData['NormalizedCrashSnow'] = (combinedData['CrashCountSnow'] - minCountSnow) / (maxCountSnow - minCountSnow) * 100
+    combinedData['NormalizedCrashWetSnow'] = (combinedData['CrashCountWetSnow'] - minCountWetSnow) / (maxCountWetSnow - minCountWetSnow) * 100
 
     # Round the normalized values to at most 1 decimal point
     combinedData['NormalizedCrash'] = combinedData['NormalizedCrash'].round(decimals=1)
+    combinedData['NormalizedCrashWet'] = combinedData['NormalizedCrashWet'].round(decimals=1)
+    combinedData['NormalizedCrashSnow'] = combinedData['NormalizedCrashSnow'].round(decimals=1)
+    combinedData['NormalizedCrashWetSnow'] = combinedData['NormalizedCrashWetSnow'].round(decimals=1)
 
     return combinedData
 
@@ -248,7 +294,18 @@ def add_column_with_normalized_crash_values(combinedData: pd.DataFrame) -> pd.Da
 def normalize_per_Route(location: str = 'sqlite:///data/data.sqlite') -> pd.DataFrame:
     weatherCrashData = read_table_from_sqlite('weatherCrashData', location)
     # Define the columns to be normalized
-    columns_to_normalize = ['Nebel', 'Black Ice', 'Neuschnee', 'Gesamtschnee', 'Niederschlag', 'Wind', 'Windböen', 'Gesamt', 'NormalizedCrash']
+    columns_to_normalize = ['Nebel', 
+                            'Black Ice', 
+                            'Neuschnee', 
+                            'Gesamtschnee', 
+                            'Niederschlag', 
+                            'Wind', 
+                            'Windböen', 
+                            'Gesamt', 
+                            'NormalizedCrash', 
+                            'NormalizedCrashWet', 
+                            'NormalizedCrashSnow', 
+                            'NormalizedCrashWetSnow']
 
     # Create a new dataframe to store the normalized data
     WeatherCrashDataNormalized = weatherCrashData.copy()
@@ -262,11 +319,19 @@ def normalize_per_Route(location: str = 'sqlite:///data/data.sqlite') -> pd.Data
             min_val = grouped_data[col].transform('min')
             max_val = grouped_data[col].transform('max')
             WeatherCrashDataNormalized[col] = (WeatherCrashDataNormalized[col] - min_val) / (max_val - min_val)
+    
+    WeatherCrashDataNormalized = WeatherCrashDataNormalized.groupby('Strecke').apply(smooth_crash_data)
 
     # The 'normalized_data' dataframe now contains the normalized values per route
     return WeatherCrashDataNormalized
 
 
+def smooth_crash_data(group: pd.DataFrame, window_size: int = 3) -> pd.DataFrame:
+    group['SmoothedCrash'] = group['NormalizedCrash'].rolling(window=window_size, min_periods=1, center=True).mean()
+    group['SmoothedCrashWet'] = group['NormalizedCrashWet'].rolling(window=window_size, min_periods=1, center=True).mean()
+    group['SmoothedCrashSnow'] = group['NormalizedCrashSnow'].rolling(window=window_size, min_periods=1, center=True).mean()
+    group['SmoothedCrashWetSnow'] = group['NormalizedCrashWetSnow'].rolling(window=window_size, min_periods=1, center=True).mean()
+    return group
 
 
 def table_exists(table_name: str, location: str = 'data/data.sqlite') -> bool:

@@ -23,6 +23,8 @@ def remove_test_file():
     # Remove the test database file
     if os.path.exists('project/test/test_data.sqlite'):
         os.remove('project/test/test_data.sqlite')
+    if os.path.exists('project/test/test_data_for_app.sqlite'):
+        os.remove('project/test/test_data_for_app.sqlite')
 
 def test_tables_exist():
     # Connect to the SQLite database
@@ -45,6 +47,9 @@ def test_tables_exist():
         'crashDataNearby2018',
         'crashDataNearby2019',
         'crashData',
+        'crashDataWet',
+        'crashDataSnow',
+        'crashDataWetSnow',
         'weatherCrashData',
         'weatherCrashDataNormalized'
     ]
@@ -447,7 +452,144 @@ def test_crashData_columns():
 
     # Close the database connection
     conn.close()
-    
+
+def test_crashData_columns():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('project/test/test_data.sqlite')  
+
+    # Get the cursor
+    cursor = conn.cursor()
+
+    # Execute a query to get the columns of the crashDataWet table
+    cursor.execute("PRAGMA table_info(crashDataWet);")
+    columns = cursor.fetchall()
+
+    # Define the expected column names and their corresponding data types
+    expected_columns = [
+        ("ULAND", "BIGINT"),
+        ("UREGBEZ", "BIGINT"),
+        ("UKREIS", "BIGINT"),
+        ("UGEMEINDE", "BIGINT"),
+        ("UJAHR", "BIGINT"),
+        ("UMONAT", "BIGINT"),
+        ("USTUNDE", "BIGINT"),
+        ("UWOCHENTAG", "BIGINT"),
+        ("UKATEGORIE", "BIGINT"),
+        ("UART", "BIGINT"),
+        ("UTYP1", "BIGINT"),
+        ("IstPKW", "BIGINT"),
+        ("IstKrad", "BIGINT"),
+        ("IstSonstig", "BIGINT"),
+        ("LICHT", "FLOAT"),
+        ("STRZUSTAND", "BIGINT"),
+        ("Longitude", "FLOAT"),
+        ("Latitude", "FLOAT"),
+        ("ULICHTVERH", "FLOAT"),
+        ("IstGkfz", "FLOAT"),
+        ("Strecke", "TEXT"),
+        ("StreckeID", "TEXT")
+    ]
+
+    # Check if the columns and their data types match the expected ones
+    for i, expected_column in enumerate(expected_columns):
+        assert columns[i][1] == expected_column[0], f"Column name mismatch for column {i+1}"
+        assert columns[i][2] == expected_column[1], f"Data type mismatch for column {i+1}"
+
+    # Close the database connection
+    conn.close()
+
+
+def test_crashData_columns():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('project/test/test_data.sqlite')  
+
+    # Get the cursor
+    cursor = conn.cursor()
+
+    # Execute a query to get the columns of the crashDataSnow table
+    cursor.execute("PRAGMA table_info(crashDataSnow);")
+    columns = cursor.fetchall()
+
+    # Define the expected column names and their corresponding data types
+    expected_columns = [
+        ("ULAND", "BIGINT"),
+        ("UREGBEZ", "BIGINT"),
+        ("UKREIS", "BIGINT"),
+        ("UGEMEINDE", "BIGINT"),
+        ("UJAHR", "BIGINT"),
+        ("UMONAT", "BIGINT"),
+        ("USTUNDE", "BIGINT"),
+        ("UWOCHENTAG", "BIGINT"),
+        ("UKATEGORIE", "BIGINT"),
+        ("UART", "BIGINT"),
+        ("UTYP1", "BIGINT"),
+        ("IstPKW", "BIGINT"),
+        ("IstKrad", "BIGINT"),
+        ("IstSonstig", "BIGINT"),
+        ("LICHT", "FLOAT"),
+        ("STRZUSTAND", "BIGINT"),
+        ("Longitude", "FLOAT"),
+        ("Latitude", "FLOAT"),
+        ("ULICHTVERH", "FLOAT"),
+        ("IstGkfz", "FLOAT"),
+        ("Strecke", "TEXT"),
+        ("StreckeID", "TEXT")
+    ]
+
+    # Check if the columns and their data types match the expected ones
+    for i, expected_column in enumerate(expected_columns):
+        assert columns[i][1] == expected_column[0], f"Column name mismatch for column {i+1}"
+        assert columns[i][2] == expected_column[1], f"Data type mismatch for column {i+1}"
+
+    # Close the database connection
+    conn.close()
+
+
+def test_crashData_columns():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('project/test/test_data.sqlite')  
+
+    # Get the cursor
+    cursor = conn.cursor()
+
+    # Execute a query to get the columns of the crashDataWetSnow table
+    cursor.execute("PRAGMA table_info(crashDataWetSnow);")
+    columns = cursor.fetchall()
+
+    # Define the expected column names and their corresponding data types
+    expected_columns = [
+        ("ULAND", "BIGINT"),
+        ("UREGBEZ", "BIGINT"),
+        ("UKREIS", "BIGINT"),
+        ("UGEMEINDE", "BIGINT"),
+        ("UJAHR", "BIGINT"),
+        ("UMONAT", "BIGINT"),
+        ("USTUNDE", "BIGINT"),
+        ("UWOCHENTAG", "BIGINT"),
+        ("UKATEGORIE", "BIGINT"),
+        ("UART", "BIGINT"),
+        ("UTYP1", "BIGINT"),
+        ("IstPKW", "BIGINT"),
+        ("IstKrad", "BIGINT"),
+        ("IstSonstig", "BIGINT"),
+        ("LICHT", "FLOAT"),
+        ("STRZUSTAND", "BIGINT"),
+        ("Longitude", "FLOAT"),
+        ("Latitude", "FLOAT"),
+        ("ULICHTVERH", "FLOAT"),
+        ("IstGkfz", "FLOAT"),
+        ("Strecke", "TEXT"),
+        ("StreckeID", "TEXT")
+    ]
+
+    # Check if the columns and their data types match the expected ones
+    for i, expected_column in enumerate(expected_columns):
+        assert columns[i][1] == expected_column[0], f"Column name mismatch for column {i+1}"
+        assert columns[i][2] == expected_column[1], f"Data type mismatch for column {i+1}"
+
+    # Close the database connection
+    conn.close()
+
 def test_weatherCrashData_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -475,7 +617,13 @@ def test_weatherCrashData_columns():
         ("Windböen", "FLOAT"),
         ("Gesamt", "FLOAT"),
         ("CrashCount", "FLOAT"),
-        ("NormalizedCrash", "FLOAT")
+        ("CrashCountWet", "FLOAT"),
+        ("CrashCountSnow", "FLOAT"),
+        ("CrashCountWetSnow", "FLOAT"),
+        ("NormalizedCrash", "FLOAT"),
+        ("NormalizedCrashWet", "FLOAT"),
+        ("NormalizedCrashSnow", "FLOAT"),
+        ("NormalizedCrashWetSnow", "FLOAT")
     ]
 
     # Check if the columns and their data types match the expected ones
@@ -513,7 +661,17 @@ def test_weatherCrashDataNormalized_columns():
         ("Windböen", "FLOAT"),
         ("Gesamt", "FLOAT"),
         ("CrashCount", "FLOAT"),
-        ("NormalizedCrash", "FLOAT")
+        ("CrashCountWet", "FLOAT"),
+        ("CrashCountSnow", "FLOAT"),
+        ("CrashCountWetSnow", "FLOAT"),
+        ("NormalizedCrash", "FLOAT"),
+        ("NormalizedCrashWet", "FLOAT"),
+        ("NormalizedCrashSnow", "FLOAT"),
+        ("NormalizedCrashWetSnow", "FLOAT"),
+        ("SmoothedCrash", "FLOAT"),
+        ("SmoothedCrashWet", "FLOAT"),
+        ("SmoothedCrashSnow", "FLOAT"),
+        ("SmoothedCrashWetSnow", "FLOAT")
     ]
 
 
@@ -527,4 +685,4 @@ def test_weatherCrashDataNormalized_columns():
 
 
 def test_final_database_exists():
-    assert os.path.exists('project/test/test_data.sqlite'), "The final database file does not exist."
+    assert os.path.exists('project/test/test_data_for_app.sqlite'), "The final database file does not exist."
