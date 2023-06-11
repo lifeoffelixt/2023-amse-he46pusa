@@ -106,6 +106,7 @@ def test_weatherdata_columns():
     # Close the database connection
     conn.close()
 
+
 def test_crashData2017_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -152,6 +153,7 @@ def test_crashData2017_columns():
 
     # Close the database connection
     conn.close()
+
 
 def test_crashData2018_columns():
     # Connect to the SQLite database
@@ -200,6 +202,7 @@ def test_crashData2018_columns():
     # Close the database connection
     conn.close()
 
+
 def test_crashData2019_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -247,6 +250,7 @@ def test_crashData2019_columns():
     # Close the database connection
     conn.close()
 
+
 def test_weatherDataID_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -282,7 +286,8 @@ def test_weatherDataID_columns():
 
     # Close the database connection
     conn.close()
-    
+
+
 def test_crashDataNearby2017_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -323,7 +328,8 @@ def test_crashDataNearby2017_columns():
 
     # Close the database connection
     conn.close()
-    
+
+
 def test_crashDataNearby2018_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -365,7 +371,8 @@ def test_crashDataNearby2018_columns():
 
     # Close the database connection
     conn.close()
-    
+
+
 def test_crashDataNearby2019_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -407,7 +414,8 @@ def test_crashDataNearby2019_columns():
 
     # Close the database connection
     conn.close()
-    
+
+
 def test_crashData_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -453,7 +461,8 @@ def test_crashData_columns():
     # Close the database connection
     conn.close()
 
-def test_crashData_columns():
+
+def test_crashDataWet_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
 
@@ -499,7 +508,7 @@ def test_crashData_columns():
     conn.close()
 
 
-def test_crashData_columns():
+def test_crashDataSnow_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
 
@@ -545,7 +554,7 @@ def test_crashData_columns():
     conn.close()
 
 
-def test_crashData_columns():
+def test_crashDataWetSnow_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
 
@@ -590,6 +599,7 @@ def test_crashData_columns():
     # Close the database connection
     conn.close()
 
+
 def test_weatherCrashData_columns():
     # Connect to the SQLite database
     conn = sqlite3.connect('project/test/test_data.sqlite')  
@@ -633,6 +643,7 @@ def test_weatherCrashData_columns():
 
     # Close the database connection
     conn.close()
+
 
 def test_weatherCrashDataNormalized_columns():
     # Connect to the SQLite database
