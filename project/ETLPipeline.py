@@ -392,7 +392,7 @@ def main(testing: bool = False) -> None:
         final_location = 'sqlite:///project/test/test_data_for_app.sqlite'
     else:
         location = 'sqlite:///data/data.sqlite'
-        final_location = 'sqlite:///data/data_for_app.sqlite'
+        final_location = 'sqlite:///project/final_report/final_report_data.sqlite'
 
     
     print_message('Begin Extracting')
