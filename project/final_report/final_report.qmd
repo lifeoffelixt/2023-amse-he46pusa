@@ -1,7 +1,7 @@
 ---
-title: "Does Weather has an significant impact on the number of highway traffic accidents?"
-author: "Felix Büppelmann"
-date: "2023-06-10"
+title: 'Does Weather has an significant impact on the number of highway traffic accidents?'
+author: 'Felix Büppelmann'
+date: '2023-06-10'
 format:
   ipynb: default
 execute:
@@ -23,21 +23,21 @@ import matplotlib.pyplot as plt
 data = pd.read_sql_table('weatherCrashData', 'sqlite:///final_report_data.sqlite')
 
 def locationMap(df, color, title, zoom=5):
-  fig = px.scatter_mapbox(df, lat="Latitude", 
-  lon="Longitude", 
+  fig = px.scatter_mapbox(df, lat='Latitude', 
+  lon='Longitude', 
   color=color,  
   size_max=8,
   zoom=zoom,
   height=500,
   hover_data={'Latitude': False, 'Longitude': False, 'Strecke': True, 'Kilometer': True},
   center={'lat': df['Latitude'].mean(), 'lon': df['Longitude'].mean()})
-  fig.update_layout(mapbox_style="outdoors", mapbox_accesstoken="pk.eyJ1IjoibGlmZW9mZmVsaXh0IiwiYSI6ImNsaXQ2aHB6ZzBsc2ozcW96MjdvZmc3azIifQ.N5nMWySGLLJcjh0Ha1e9CA")
+  fig.update_layout(mapbox_style='outdoors', mapbox_accesstoken='pk.eyJ1IjoibGlmZW9mZmVsaXh0IiwiYSI6ImNsaXQ2aHB6ZzBsc2ozcW96MjdvZmc3azIifQ.N5nMWySGLLJcjh0Ha1e9CA')
   fig.update_layout(title_text=title, title_x=0.5)
   return fig
 
 def densityMap(df, z, title):
-  fig = px.density_mapbox(df, lat="Latitude", 
-  lon="Longitude",  
+  fig = px.density_mapbox(df, lat='Latitude', 
+  lon='Longitude',  
   z=z, 
   radius=3,
   zoom=4,
@@ -45,12 +45,25 @@ def densityMap(df, z, title):
   hover_data={'Latitude': False, 'Longitude': False, 'Strecke': True, 'Kilometer': True},
   center={'lat': df['Latitude'].mean(), 'lon': df['Longitude'].mean()})
   #fig.update_layout(mapbox_style='stamen-toner')
-  fig.update_layout(mapbox_style="outdoors", mapbox_accesstoken="pk.eyJ1IjoibGlmZW9mZmVsaXh0IiwiYSI6ImNsaXQ2aHB6ZzBsc2ozcW96MjdvZmc3azIifQ.N5nMWySGLLJcjh0Ha1e9CA")
+  fig.update_layout(mapbox_style='outdoors', mapbox_accesstoken='pk.eyJ1IjoibGlmZW9mZmVsaXh0IiwiYSI6ImNsaXQ2aHB6ZzBsc2ozcW96MjdvZmc3azIifQ.N5nMWySGLLJcjh0Ha1e9CA')
   fig.update_layout(title_text=title, title_x=0.5)
   return fig
 
-if not os.path.exists("images"):
-    os.mkdir("images")
+def correlationPlot(df, columns_to_exclude, title):
+  # Select only the columns of interest
+  selected_columns = [col for col in df.columns if col not in columns_to_exclude]
+
+  # Calculate the correlation matrix
+  corr_matrix = df[selected_columns].corr()
+
+  # Plot the correlation matrix
+  plt.figure(figsize=(10, 8))
+  sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+  plt.title(title)
+  return plt, corr_matrix
+
+if not os.path.exists('images'):
+    os.mkdir('images')
 ```
 
 ## Summary
@@ -95,20 +108,27 @@ It analyses whether highway segments that are particularly exposed to extreme we
 During the first analysis all routes are looked at. The first map shows the location of the routes. The second map shows the number of crashes per kilometer normalized. The third map shows the normalized weather events per kilometer. The higher the number the more and severe weather events occured. 
 ```{python}
 fig_1 = locationMap(data, 'Strecke', 'Map of all the routes', zoom=4)
-fig_1.show()
-fig_1.write_image("images/Strecke.png")
+#fig_1.show()
+fig_1.write_image('images/Strecke.png')
 ```
+![Map of all the routes](images/Strecke.png){width='100%'}
 
-::: {.content-hidden unless-format="ipynb"}
-![Map of all the routes](images/Strecke.png){width="100%"}
-:::
 
 ```{python}
 fig_2 = densityMap(data, 'NormalizedCrash', 'Map of all the crashes along the routes')
-fig_3 = densityMap(data, 'Gesamt', 'Map of the weather events combined along the routes')
-fig_2.show()
-fig_3.show()
+#fig_2.show()
+fig_2.write_image('images/Crash.png')
 ```
+
+![Map of all the crashes along the routes](images/Crash.png){width='100%'}
+
+```{python}
+fig_3 = densityMap(data, 'Gesamt', 'Map of the weather events combined along the routes')
+#fig_3.show()
+fig_3.write_image('images/Weather.png')
+```
+
+![Map of the weather events combined along the routes](images/Weather.png){width='100%'}
 
 It can be seen that the number of crashes is higher in the south of Germany. The weather events are also more severe in the south. My hypothesis is that the weather events have an impact on the number of crashes. Therefore a correlation analysis is performed. 
 
@@ -117,32 +137,100 @@ It can be seen that the number of crashes is higher in the south of Germany. The
 # List of columns to exclude from correlation calculation
 columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrashWet', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow']  # Add the column names you want to exclude
 
-# Select only the columns of interest
-selected_columns = [col for col in data.columns if col not in columns_to_exclude]
 
-# Calculate the correlation matrix
-corr_matrix = data[selected_columns].corr()
-
-# Plot the correlation matrix
-plt.figure(figsize=(10, 8))
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
-plt.title('Correlation Matrix')
+plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix')
 plt.show()
 ```
+
 The correlation matrix shows that there are following weather events that have a high correlation with the number of crashes:
+
 ```{python}
 # Find the column(s) with the highest correlation coefficient(s)
-highest_corr = corr_matrix['NormalizedCrash'].abs().nlargest(5)  # Change 'CarCrashes' to your actual car crash column name
-top_weather_phenomena = highest_corr.index[1:]  # Exclude 'CarCrashes' itself if present
+highest_corr = corr_matrix['NormalizedCrash'].abs().nlargest(5)  
+top_weather_phenomena = highest_corr.index[1:]  
 top_weather_phenomena
 ```
+
 It is interesting that the number of crashes is not strongly correlated with the number of weather events. Further it is interesting that the top correlated weather events are 'Windböen' and 'Wind' which are both related to wind, and these are correlated negativly. Which means that the more wind there is on a highway, the less crashes happen. This is counterintuitive. One possible reason for that is that people drive more carefully when there is more wind, but this is speculation. 
 
-The only positive correlation is with 'Niederschlag' which means that the more precipitation there is, the more crashes happen. This seams reasonable. To explore this further the data is filtered for crashes that happened during or due to precipitation.
+The only positive correlation is with 'Niederschlag' which means that the more precipitation there is, the more crashes happen. This seams reasonable. 
 
-#### Analysis of crashes during precipitation
+### Analysis of crashes during precipitation
+To explore this further the data is filtered for crashes that happened during or due to precipitation. The following map shows the location of crashes in the wet. The secod map shows the precipitation along the routes.
 
 ```{python}
 fig_4 = densityMap(data, 'NormalizedCrashWet', 'Map of all the crashes in the Wet along the routes')
-fig_4.show()
+#fig_4.show()
+fig_4.write_image('images/CrashWet.png')
+```
+
+![Map of all the crashes in the Wet along the routes](images/CrashWet.png){width='100%'}
+
+```{python}
+fig_5 = densityMap(data, 'Niederschlag', 'Map of the precipitation along the routes')
+#fig_5.show()
+fig_5.write_image('images/Precipitation.png')
+```
+
+![Map of the precipitation along the routes](images/Precipitation.png){width='100%'}
+
+When you overlay the maps in your mind you can see that they are kind of similar. Areas where less precipitation is measured have less crashes and areas with more precipitation have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant . 
+
+#### Correlation Analysis
+
+```{python}
+# List of columns to exclude from correlation calculation
+columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrash', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow']  # Add the column names you want to exclude
+
+plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix of precipitation crashes')
+plt.show()
+```
+
+There is not much difference to the correlation matrix of all crashes. The only difference is that the correlation between 'Niederschlag' and 'NormalizedCrashWet' is higher. Which seems obvious.
+```{python}
+# Find the column(s) with the highest correlation coefficient(s)
+highest_corr = corr_matrix['NormalizedCrashWet'].abs().nlargest(5)  
+top_weather_phenomena = highest_corr.index[1:]  
+top_weather_phenomena
+```
+
+### Analysis of crashes due to snow
+
+Another kind of precipitation is snow. It is investigeted because the crash data can be filtered for crashes that happened during or due to snow. The following map shows the location of crashes due of snow. The secod map shows the snow along the routes.
+
+```{python}
+fig_6 = densityMap(data, 'NormalizedCrashSnow', 'Map of all the crashes in the Snow along the routes')
+#fig_6.show()
+fig_6.write_image('images/CrashSnow.png')
+```
+
+[![Map of all the crashes in the Snow along the routes](images/CrashSnow.png)]
+  
+```{python}
+fig_7 = densityMap(data, 'Gesamtschnee', 'Map of the snow along the routes')
+#fig_7.show()
+fig_7.write_image('images/Snow.png')
+```
+
+![Map of the snow along the routes](images/Snow.png){width='100%'}
+
+When you overlay the maps in your mind you can see that they are kind of similar. Areas where less snow is measured have less crashes and areas with more snow have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant.
+
+#### Correlation Analysis
+
+```{python}
+# List of columns to exclude from correlation calculation
+columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrash', 'NormalizedCrashWet', 'NormalizedCrashWetSnow']  # Add the column names you want to exclude
+
+plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix of snow crashes')
+plt.show()
+```
+
+There is not much difference to the correlation matrix of all crashes. The only difference is that the correlation between 'Gesamtschnee' and 'NormalizedCrashSnow' is higher. Which seems obvious.
+
+```{python}
+# Find the column(s) with the highest correlation coefficient(s)
+highest_corr = corr_matrix['NormalizedCrashSnow'].abs().nlargest(5)  
+top_weather_phenomena = highest_corr.index[1:]  
+top_weather_phenomena
 ```
