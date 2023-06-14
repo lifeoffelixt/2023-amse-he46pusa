@@ -12,11 +12,11 @@ column_names = {
     2: "name",
     12: "petrol",
     22: "diesel",
-    33: "gas",
+    32: "gas",
     42: "electro",
     52: "hybrid",
-    61: "plugInHybrid",
-    69: "others"
+    62: "plugInHybrid",
+    72: "others"
 }
 df = pd.read_csv(data_url, encoding="latin1", sep=";", skiprows=6, skipfooter=4, engine="python", header=None)
 df.rename(columns=column_names, inplace=True)
@@ -34,7 +34,7 @@ df = df.astype({"CIN": str})  # Convert CIN column to string
 
 # Convert numeric columns to appropriate data types and fill null values with 0
 numeric_columns = ["petrol", "diesel", "gas", "electro", "hybrid", "plugInHybrid", "others"]
-df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors="coerce").fillna(0)
+df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors="coerce")
 
 # Drop rows with negative values
 df = df[df[numeric_columns].ge(0).all(axis=1)]
