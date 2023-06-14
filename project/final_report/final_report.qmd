@@ -1,15 +1,11 @@
 ---
 title: "Does Weather has an significant impact on the number of highway traffic accidents?"
-subtitle: "A SAMSE project"
-title-block-style: default
 author: "Felix Büppelmann"
 date: "2023-06-10"
 format:
-  html:
-    embed-resources: true
   ipynb: default
 execute:
-  echo: false
+  echo: true
 jupyter: samse_3.11
 ---
 
@@ -95,16 +91,12 @@ It analyses whether highway segments that are particularly exposed to extreme we
 
 During the first analysis all routes are looked at. The first map shows the location of the routes. The second map shows the number of crashes per kilometer normalized. The third map shows the normalized weather events per kilometer. The higher the number the more and severe weather events occured. 
 ```{python}
-#| column: screen-inset-shaded
-#| layout-ncol: 1
 fig_1 = locationMap(data, 'Strecke', 'Map of all the routes', zoom=4)
 fig_1.show()
 ```
 
 
 ```{python}
-#| column: screen-inset-shaded
-#| layout-ncol: 2
 fig_2 = densityMap(data, 'NormalizedCrash', 'Map of all the crashes along the routes')
 fig_3 = densityMap(data, 'Gesamt', 'Map of the weather events combined along the routes')
 fig_2.show()
