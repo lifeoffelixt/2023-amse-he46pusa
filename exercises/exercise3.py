@@ -27,21 +27,17 @@ df.drop(columns=columns_to_drop, inplace=True)
 
 # Convert columns to appropriate data types
 df["CIN"] = df["CIN"].astype(str)
-df["petrol"] = pd.to_numeric(df["petrol"], errors="coerce")
-df["diesel"] = pd.to_numeric(df["diesel"], errors="coerce")
-df["gas"] = pd.to_numeric(df["gas"], errors="coerce")
-df["electro"] = pd.to_numeric(df["electro"], errors="coerce")
-df["hybrid"] = pd.to_numeric(df["hybrid"], errors="coerce")
-df["plugInHybrid"] = pd.to_numeric(df["plugInHybrid"], errors="coerce")
-df["others"] = pd.to_numeric(df["others"], errors="coerce")
 
 # Validate and clean the data
 df = df[pd.to_numeric(df["CIN"], errors="coerce").notnull()]  # Filter valid CINs
 df = df.astype({"CIN": str})  # Convert CIN column to string
 
-# Drop rows with negative values and replace null values with 0
-df = df[df.select_dtypes(include=["float64", "int64"]).ge(0).all(axis=1)]
-df.fillna(0, inplace=True)
+# Convert numeric columns to appropriate data types and fill null values with 0
+numeric_columns = ["petrol", "diesel", "gas", "electro", "hybrid", "plugInHybrid", "others"]
+df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors="coerce").fillna(0)
+
+# Drop rows with negative values
+df = df[df[numeric_columns].ge(0).all(axis=1)]
 
 # Create a connection to the SQLite database using SQLAlchemy
 engine = create_engine(f"sqlite:///{database_path}")
