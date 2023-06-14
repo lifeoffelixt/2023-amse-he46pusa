@@ -25,6 +25,16 @@ df.rename(columns=column_names, inplace=True)
 columns_to_drop = [col for col in df.columns if col not in column_names.values()]
 df.drop(columns=columns_to_drop, inplace=True)
 
+# Convert columns to appropriate data types
+df["CIN"] = df["CIN"].astype(str)
+df["petrol"] = pd.to_numeric(df["petrol"], errors="coerce")
+df["diesel"] = pd.to_numeric(df["diesel"], errors="coerce")
+df["gas"] = pd.to_numeric(df["gas"], errors="coerce")
+df["electro"] = pd.to_numeric(df["electro"], errors="coerce")
+df["hybrid"] = pd.to_numeric(df["hybrid"], errors="coerce")
+df["plugInHybrid"] = pd.to_numeric(df["plugInHybrid"], errors="coerce")
+df["others"] = pd.to_numeric(df["others"], errors="coerce")
+
 # Validate and clean the data
 df = df[pd.to_numeric(df["CIN"], errors="coerce").notnull()]  # Filter valid CINs
 df = df.astype({"CIN": str})  # Convert CIN column to string
@@ -34,7 +44,7 @@ df = df[df.select_dtypes(include="number").ge(0).all(1)]  # Filter rows with pos
 engine = create_engine(f"sqlite:///{database_path}")
 
 # Write the DataFrame into a SQLite table called "cars"
-df.to_sql("cars", engine, if_exists="replace", index=False)
+df.to_sql("cars1", engine, if_exists="replace", index=False)
 
 # Close the database connection
 engine.dispose()
