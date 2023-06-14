@@ -48,6 +48,9 @@ def densityMap(df, z, title):
   fig.update_layout(mapbox_style="outdoors", mapbox_accesstoken="pk.eyJ1IjoibGlmZW9mZmVsaXh0IiwiYSI6ImNsaXQ2aHB6ZzBsc2ozcW96MjdvZmc3azIifQ.N5nMWySGLLJcjh0Ha1e9CA")
   fig.update_layout(title_text=title, title_x=0.5)
   return fig
+
+if not os.path.exists("images"):
+    os.mkdir("images")
 ```
 
 ## Summary
@@ -93,8 +96,12 @@ During the first analysis all routes are looked at. The first map shows the loca
 ```{python}
 fig_1 = locationMap(data, 'Strecke', 'Map of all the routes', zoom=4)
 fig_1.show()
+fig_1.write_image("images/Strecke.png")
 ```
 
+::: {.content-hidden unless-format="ipynb"}
+![Map of all the routes](images/Strecke.png){width="100%"}
+:::
 
 ```{python}
 fig_2 = densityMap(data, 'NormalizedCrash', 'Map of all the crashes along the routes')
