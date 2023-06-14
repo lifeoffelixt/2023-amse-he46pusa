@@ -374,9 +374,9 @@ def calculate_distance(coords1: np.array, coords2: np.array) -> np.array:
     return distance
 
 
-def store_transformed_data_in_own_database(org_location: str = 'sqlite:///data/data.sqlite', store_location: str = 'sqlite:///data/data_for_app.sqlite') -> None:
-    data = read_table_from_sqlite('weatherCrashDataNormalized', org_location)
-    data.to_sql('weatherCrashDataNormalized', store_location, if_exists='replace', index=False)
+def store_transformed_data_in_own_database(table: str, org_location: str = 'sqlite:///data/data.sqlite', store_location: str = 'sqlite:///data/data_for_app.sqlite') -> None:
+    data = read_table_from_sqlite(table, org_location)
+    data.to_sql(table, store_location, if_exists='replace', index=False)
 
 
 def print_message(message: str) -> None:
@@ -413,7 +413,8 @@ def main(testing: bool = False) -> None:
     
     print_message('Begin Transforming')
     transform(location)
-    store_transformed_data_in_own_database(location, final_location)
+    store_transformed_data_in_own_database('weatherCrashData', location, final_location)
+    store_transformed_data_in_own_database('weatherCrashDataNormalized', location, final_location)
     print_message('Finished Transforming')
 
 
