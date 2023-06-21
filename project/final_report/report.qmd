@@ -3,8 +3,10 @@ title: 'Does Weather has an significant impact on the number of highway traffic 
 author: 'Felix Büppelmann'
 date: '2023-06-16'
 format:
-  beamer:
-    echo: false
+  html:
+    embed-resources: true
+    code-fold: true
+    code-summary: "Show the code"
 execute:
   echo: true
 jupyter: samse_3.11
@@ -51,6 +53,7 @@ It analyses whether highway segments that are particularly exposed to extreme we
 
 ```{python}
 #| context: setup
+#| code-summary: "Setup code"
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -63,6 +66,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 data = pd.read_sql_table('weatherCrashData', 'sqlite:///final_report_data.sqlite')
 data_per_route = pd.read_sql_table('weatherCrashDataNormalized', 'sqlite:///final_report_data.sqlite')
+data_per_route.rename(columns={'SmoothedCrash': 'Crash'}, inplace=True)
 
 def locationMap(df, color, title, zoom=4):
   fig = px.scatter_mapbox(df, lat='Latitude', 
@@ -125,42 +129,20 @@ def save_image(fig, name):
 During the first analysis all routes are looked at. The first map shows the location of the routes. The second map shows the number of crashes per kilometer normalized. The third map shows the normalized weather events per kilometer. The higher the number the more and severe weather events occured. 
 ```{python}
 fig_1 = locationMap(data, 'Strecke', 'Map of all the routes', zoom=4)
-save_image(fig_1, 'Strecke.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the routes](images/Strecke.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_1.show()
 ```
-:::
+
 
 ```{python}
 fig_2 = densityMap(data, 'NormalizedCrash', 'Map of all the crashes along the routes')
-save_image(fig_2, 'Crash.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the crashes along the routes](images/Crash.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_2.show()
 ```
-:::
 
 ```{python}
 fig_3 = densityMap(data, 'Gesamt', 'Map of the weather events combined along the routes')
-save_image(fig_3, 'Weather.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of the weather events combined along the routes](images/Weather.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_3.show()
 ```
-:::
+
 It can be seen that the number of crashes is higher in the south of Germany. The weather events are also more severe in the south. My hypothesis is that the weather events have an impact on the number of crashes. Therefore a correlation analysis is performed. 
 
 #### Correlation Analysis
@@ -179,7 +161,7 @@ The correlation matrix shows that there are following weather events that have a
 # Find the column(s) with the highest correlation coefficient(s)
 highest_corr = corr_matrix['NormalizedCrash'].abs().nlargest(5)  
 top_weather_phenomena = highest_corr.index[1:]  
-top_weather_phenomena
+list(top_weather_phenomena)
 ```
 
 It is interesting that the number of crashes is not strongly correlated with the number of weather events. Further it is interesting that the top correlated weather events are 'Windböen' and 'Wind' which are both related to wind, and these are correlated negativly. Which means that the more wind there is on a highway, the less crashes happen. This is counterintuitive. One possible reason for that is that people drive more carefully when there is more wind, but this is speculation. 
@@ -230,29 +212,13 @@ To explore this further the data is filtered for crashes that happened during or
 
 ```{python}
 fig_4 = densityMap(data, 'NormalizedCrashWet', 'Map of all the crashes in the Wet along the routes')
-save_image(fig_4, 'CrashWet.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the crashes in the Wet along the routes](images/CrashWet.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_4.show()
 ```
-:::
 ```{python}
 fig_5 = densityMap(data, 'Niederschlag', 'Map of the precipitation along the routes')
-save_image(fig_5, 'Precipitation.png')
-
-```
-::: {.content-visible unless-format="html"}
-![Map of the precipitation along the routes](images/Precipitation.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_5.show()
 ```
-:::
+
 When you overlay the maps in your mind you can see that they are kind of similar. Areas where less precipitation is measured have less crashes and areas with more precipitation have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant . 
 
 #### Correlation Analysis
@@ -270,7 +236,7 @@ There is not much difference to the correlation matrix of all crashes. The only 
 # Find the column(s) with the highest correlation coefficient(s)
 highest_corr = corr_matrix['NormalizedCrashWet'].abs().nlargest(5)  
 top_weather_phenomena = highest_corr.index[1:]  
-top_weather_phenomena
+list(top_weather_phenomena)
 ```
 
 ### Analysis of crashes due to snow
@@ -279,28 +245,13 @@ Another kind of precipitation is snow. It is investigated because the crash data
 
 ```{python}
 fig_6 = densityMap(data, 'NormalizedCrashSnow', 'Map of all the crashes in the Snow along the routes')
-save_image(fig_6, 'CrashSnow.png')
-```
-::: {.content-visible unless-format="html"}
-[![Map of all the crashes in the Snow along the routes](images/CrashSnow.png)]
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_6.show()
 ```
-:::
 ```{python}
 fig_7 = densityMap(data, 'Gesamtschnee', 'Map of the snow along the routes')
-save_image(fig_7, 'Snow.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of the snow along the routes](images/Snow.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_7.show()
 ```
-:::
+
 When you overlay the maps in your mind you can see that they are kind of similar. Areas where less snow is measured have less crashes and areas with more snow have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant.
 
 #### Correlation Analysis
@@ -319,7 +270,7 @@ There is not much difference to the correlation matrix of all crashes. The only 
 # Find the column(s) with the highest correlation coefficient(s)
 highest_corr = corr_matrix['NormalizedCrashSnow'].abs().nlargest(5)  
 top_weather_phenomena = highest_corr.index[1:]  
-top_weather_phenomena
+list(top_weather_phenomena)
 ```
 
 ### Analysis of one route with relativ high crash occurence (Karlsruhe - Munich)
@@ -327,34 +278,18 @@ When you look at the map of all crashes you can see that there is one route with
 
 ```{python}
 fig_8 = densityMap(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'NormalizedCrash', 'Map of the crashes along the route Karlsruhe to Munich', zoom=4.5)
-save_image(fig_8, 'CrashKarlsruheMunich.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the crashes along the routes](images/CrashKarlsruheMunich.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_8.show()
-```
-::: 
+``` 
 ```{python}
 fig_9 = densityMap(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'Gesamt', 'Map of the weather events combined along the route Karlsruhe to Munich', zoom=4.5)
-save_image(fig_9, 'WeatherKarlsruheMunich.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the crashes along the routes](images/WeatherKarlsruheMunich.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
 fig_9.show()
-```
-::: 
+``` 
 When you compare the two maps it is visible that in areas with more (severe) weather events less crashs happen. This is an indicator for the fact that the weather events are not the main reason for the crashes and that the correlation seems to be negative. In the following the correlation is calculated between all relevant features is calculated. 
 
 #### Karlsruhe - Munich Correlation Analysis
 ```{python}
 # List of columns to exclude from correlation calculation
-columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrashWet', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow', 'SmoothedCrash', 'SmoothedCrashWet', 'SmoothedCrashSnow', 'SmoothedCrashWetSnow']  # Add the column names you want to exclude
+columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrashWet', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow', 'Crash', 'SmoothedCrashWet', 'SmoothedCrashSnow', 'SmoothedCrashWetSnow']  # Add the column names you want to exclude
 
 
 plt, corr_matrix = correlationPlot(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], columns_to_exclude, 'Correlation Matrix')
@@ -367,7 +302,7 @@ The correlation matrix shows that there are following weather events that have a
 # Find the column(s) with the highest correlation coefficient(s)
 highest_corr = corr_matrix['NormalizedCrash'].abs().nlargest(5)  
 top_weather_phenomena = highest_corr.index[1:]  
-top_weather_phenomena
+list(top_weather_phenomena)
 ```
 
 As suspected the correlation is negative. This means that the more weather events happen the less crashes happen. This is an indicator that the weather events are not the main reason for the crashes. Furthere analysis on filtered data after wet and snow crashes are not done because the correlation is negative and the weather events are not the main reason for the crashes. 
@@ -376,17 +311,9 @@ As suspected the correlation is negative. This means that the more weather event
 The final analysis is done by looking at the weather events and crashes per kilometer. This is done to see if there are areas with more weather events and crashes. Especially the weather Events 'Gesamt', 'Niederschlag', 'Gesamtschnee' and 'Wind' are analyzed. 
 
 ```{python}
-fig_10 = linePlot(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'Kilometer', ['SmoothedCrash','Gesamt', 'Niederschlag', 'Gesamtschnee', 'Wind'], 'Crash and Weather Events per Kilometer', 'Kilometer', '')
-save_image(fig_10, 'KarlsruheMunichKilometer.png')
-```
-::: {.content-visible unless-format="html"}
-![Map of all the crashes along the routes](images/KarlsruheMunichKilometer.png){width='100%'}
-:::
-::: {.content-visible when-format="html"}
-```{python}
+fig_10 = linePlot(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'Kilometer', ['Crash','Gesamt', 'Niederschlag', 'Gesamtschnee', 'Wind'], 'Crash and Weather Events per Kilometer', 'Kilometer', '')
 fig_10.show()
 ```
-:::
 
 The graph underlines the negative correlation between weather events and crashes. The more weather events happen the less crashes happen.
 
