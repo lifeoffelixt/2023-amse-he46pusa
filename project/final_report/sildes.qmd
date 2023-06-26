@@ -3,12 +3,11 @@ title: 'Does Weather has an significant impact on the number of highway traffic 
 author: 'Felix Büppelmann'
 date: '2023-06-16'
 format:
-  html:
-    embed-resources: true
-    code-fold: true
-    code-summary: "Show the code"
+  beamer: 
+    aspectratio: 169
+    navigation: horizontal
 execute:
-  echo: true
+  echo: false
 jupyter: samse_3.11
 ---
 
@@ -34,26 +33,8 @@ It analyses whether highway segments that are particularly exposed to extreme we
 * Data Type: ZIP/CSV
 * Description: Road traffic accident data of 2017 to 2019 of Germany.
 
-## Transformations
-
-1. Preporcessing of the weather data
-    * Give each weather measure point a unique ID
-    * As the measure points are distributed one kilometer apart from each other, each points gets an kilomter marker
-2. Preprocessing of the crash data
-    * Dropping rows with irrelevant data (turn accidents, bike accidents, etc.)
-    * Drop columns with irrelevant data
-3. Connect the crash data with the weather data
-    * For each crash, find the closest weather measure point (Treshold: 600m)
-      + Drop rows where no point is within the treshold
-      + If there are multiple points within the treshold, select the one closest
-    * Merge crash data to the weather data
-4. Normalize the combined data per Route
-
-## Analysis
-
 ```{python}
 #| context: setup
-#| code-summary: "Setup code"
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -125,27 +106,38 @@ def save_image(fig, name):
     fig.write_image(location)
 ```
 
-### Analysis of all routes
-During the first analysis all routes are looked at. The first map shows the location of the routes. The second map shows the number of crashes per kilometer normalized. The third map shows the normalized weather events per kilometer. The higher the number the more and severe weather events occured. 
-```{python}
-fig_1 = locationMap(data, 'Strecke', 'Map of all the routes', zoom=4)
-fig_1.show()
-```
+## Transformations
+
+1. Preporcessing of the weather data
+    * Give each weather measure point a unique ID
+    * As the measure points are distributed one kilometer apart from each other, each points gets an kilomter marker
+2. Preprocessing of the crash data
+    * Dropping rows with irrelevant data (turn accidents, bike accidents, etc.)
+    * Drop columns with irrelevant data
+3. Connect the crash data with the weather data
+    * For each crash, find the closest weather measure point (Treshold: 600m)
+      + Drop rows where no point is within the treshold
+      + If there are multiple points within the treshold, select the one closest
+    * Merge crash data to the weather data
+4. Normalize the combined data per Route
+
+## Analysis of all routes combined
 
 
-```{python}
-fig_2 = densityMap(data, 'NormalizedCrash', 'Map of all the crashes along the routes')
-fig_2.show()
-```
 
-```{python}
-fig_3 = densityMap(data, 'Gesamt', 'Map of the weather events combined along the routes')
-fig_3.show()
-```
+![Map of all the routes](images/Strecke.png){width='80%'}
 
-It can be seen that the number of crashes is higher in the south of Germany. The weather events are also more severe in the south. My hypothesis is that the weather events have an impact on the number of crashes. Therefore a correlation analysis is performed. 
+## Crashes of all routes
 
-#### Correlation Analysis
+![Map of all the crashes](images/Crash.png){width='80%'}
+
+## Weather of all routes
+![Map of all the crashes](images/Weather.png){width='80%'}
+
+
+ 
+
+## Correlation Analysis
 ```{python}
 # List of columns to exclude from correlation calculation
 columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrashWet', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow']  # Add the column names you want to exclude
@@ -155,7 +147,7 @@ plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix
 plt.show()
 ```
 
-The correlation matrix shows that there are following weather events that have a high correlation with the number of crashes:
+
 
 ```{python}
 # Find the column(s) with the highest correlation coefficient(s)
@@ -164,12 +156,9 @@ top_weather_phenomena = highest_corr.index[1:]
 list(top_weather_phenomena)
 ```
 
-It is interesting that the number of crashes is not strongly correlated with the number of weather events. Further it is interesting that the top correlated weather events are 'Windböen' and 'Wind' which are both related to wind, and these are correlated negativly. Which means that the more wind there is on a highway, the less crashes happen. This is counterintuitive. One possible reason for that is that people drive more carefully when there is more wind, but this is speculation. 
 
-The only positive correlation is with 'Niederschlag' which means that the more precipitation there is, the more crashes happen. This seams reasonable. 
+## Feature Importance
 
-#### Feature Importance
-A further analyis is the feature importance of a Random Forest Regressor which tries to predict how likely a crash is based on the weather input.
 
 ```{python}
 # List of columns to exclude from correlation calculation
@@ -205,23 +194,19 @@ plt.ylabel('Feature')
 plt.show()
 ```
 
-In a random forest regressor model the weather effect which is most important for predicting the likelihood of a crash is 'Black Ice'. Which can be reasonable as Driver may get suprised by ice on the road. Sadly there no way to filter the crash data for accidents that occur due to Ice. This is also true for the second most important feature 'Windböen'. Overall it can be said that none of these feature sticks out significantly. As 'Niederschlag' is one feature that the crash data can be filtered for, this is done in the next step.
 
-### Analysis of crashes during precipitation
-To explore this further the data is filtered for crashes that happened during or due to precipitation. The following map shows the location of crashes in the wet. The secod map shows the precipitation along the routes.
+## Analysis of crashes during precipitation
 
-```{python}
-fig_4 = densityMap(data, 'NormalizedCrashWet', 'Map of all the crashes in the Wet along the routes')
-fig_4.show()
-```
-```{python}
-fig_5 = densityMap(data, 'Niederschlag', 'Map of the precipitation along the routes')
-fig_5.show()
-```
 
-When you overlay the maps in your mind you can see that they are kind of similar. Areas where less precipitation is measured have less crashes and areas with more precipitation have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant . 
+![Map of all the crashe in the wet](images/CrashWet.png){width='80%'}
 
-#### Correlation Analysis
+## Precipitation Map
+
+![Map of all the crashe in the wet](images/Precipitation.png){width='80%'}
+
+
+
+## Correlation Analysis of wet weather crashes
 
 ```{python}
 # List of columns to exclude from correlation calculation
@@ -231,7 +216,7 @@ plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix
 plt.show()
 ```
 
-There is not much difference to the correlation matrix of all crashes. The only difference is that the correlation between 'Niederschlag' and 'NormalizedCrashWet' is higher. Which seems obvious.
+
 ```{python}
 # Find the column(s) with the highest correlation coefficient(s)
 highest_corr = corr_matrix['NormalizedCrashWet'].abs().nlargest(5)  
@@ -239,22 +224,17 @@ top_weather_phenomena = highest_corr.index[1:]
 list(top_weather_phenomena)
 ```
 
-### Analysis of crashes due to snow
+## Analysis of crashes due to snow
 
-Another kind of precipitation is snow. It is investigated because the crash data can be filtered for crashes that happened during or due to snow. The following map shows the location of crashes due of snow. The second map shows the snow along the routes.
 
-```{python}
-fig_6 = densityMap(data, 'NormalizedCrashSnow', 'Map of all the crashes in the Snow along the routes')
-fig_6.show()
-```
-```{python}
-fig_7 = densityMap(data, 'Gesamtschnee', 'Map of the snow along the routes')
-fig_7.show()
-```
+![Map of all the crashe in the snow](images/CrashSnow.png){width='80%'}
 
-When you overlay the maps in your mind you can see that they are kind of similar. Areas where less snow is measured have less crashes and areas with more snow have more crashes. This is not a strong correlation but it is visible. In the following the correlation is calculated between all relevant.
+## Snow Map
 
-#### Correlation Analysis
+![Map of snow](images/Snow.png){width='80%'}
+
+
+## Correlation Analysis
 
 ```{python}
 # List of columns to exclude from correlation calculation
@@ -264,29 +244,16 @@ plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix
 plt.show()
 ```
 
-There is not much difference to the correlation matrix of all crashes. The only difference is that the correlation between 'Gesamtschnee' and 'Neuschnee' and 'NormalizedCrashSnow' is higher. Which seems obvious.
+## Analysis of one route with relativ high crash occurence (Karlsruhe - Munich)
 
-```{python}
-# Find the column(s) with the highest correlation coefficient(s)
-highest_corr = corr_matrix['NormalizedCrashSnow'].abs().nlargest(5)  
-top_weather_phenomena = highest_corr.index[1:]  
-list(top_weather_phenomena)
-```
+![Map of all the crashe in the wet](images/CrashKarlsruheMunich.png){width='80%'}
 
-### Analysis of one route with relativ high crash occurence (Karlsruhe - Munich)
-When you look at the map of all crashes you can see that there is one route with a relativ high crash occurence. This route is the A8 from Karlsruhe to Munich. In the following the crashes on this route are analyzed in more detail.
+## Weather Map
 
-```{python}
-fig_8 = densityMap(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'NormalizedCrash', 'Map of the crashes along the route Karlsruhe to Munich', zoom=4.5)
-fig_8.show()
-``` 
-```{python}
-fig_9 = densityMap(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'Gesamt', 'Map of the weather events combined along the route Karlsruhe to Munich', zoom=4.5)
-fig_9.show()
-``` 
-When you compare the two maps it is visible that in areas with more (severe) weather events less crashs happen. This is an indicator for the fact that the weather events are not the main reason for the crashes and that the correlation seems to be negative. In the following the correlation is calculated between all relevant features is calculated. 
+![Map of all the crashe in the wet](images/WeatherKarlsruheMunich.png){width='80%'}
 
-#### Karlsruhe - Munich Correlation Analysis
+
+## Karlsruhe - Munich Correlation Analysis
 ```{python}
 # List of columns to exclude from correlation calculation
 columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrashWet', 'NormalizedCrashSnow', 'NormalizedCrashWetSnow', 'Crash', 'SmoothedCrashWet', 'SmoothedCrashSnow', 'SmoothedCrashWetSnow']  # Add the column names you want to exclude
@@ -296,26 +263,16 @@ plt, corr_matrix = correlationPlot(data_per_route[data_per_route['Strecke'] == '
 plt.show()
 ```
 
-The correlation matrix shows that there are following weather events that have a high correlation with the number of crashes:
 
-```{python}
-# Find the column(s) with the highest correlation coefficient(s)
-highest_corr = corr_matrix['NormalizedCrash'].abs().nlargest(5)  
-top_weather_phenomena = highest_corr.index[1:]  
-list(top_weather_phenomena)
-```
+## Karlruhe to Munich Weather Events and Crashes per Kilometer
 
-As suspected the correlation is negative. This means that the more weather events happen the less crashes happen. This is an indicator that the weather events are not the main reason for the crashes. Furthere analysis on filtered data after wet and snow crashes are not done because the correlation is negative and the weather events are not the main reason for the crashes. 
 
-#### Karlruhe to Munich Weather Events and Crashes per Kilometer
-The final analysis is done by looking at the weather events and crashes per kilometer. This is done to see if there are areas with more weather events and crashes. Especially the weather Events 'Gesamt', 'Niederschlag', 'Gesamtschnee' and 'Wind' are analyzed. 
-
+![Crash and Weather Events per Kilometer](images/KarlsruheMunichKilometer.png){width='80%'}
 ```{python}
 fig_10 = linePlot(data_per_route[data_per_route['Strecke'] == 'Karlsruhe_Muenchen'], 'Kilometer', ['Crash','Gesamt', 'Niederschlag', 'Gesamtschnee', 'Wind'], 'Crash and Weather Events per Kilometer', 'Kilometer', '')
 fig_10.show()
 ```
 
-The graph underlines the negative correlation between weather events and crashes. The more weather events happen the less crashes happen.
 
 ## Conclusion
 The analysis investigates whether highway segments exposed to extreme weather events lead to more car crashes. Here are the key findings:
@@ -328,6 +285,7 @@ The analysis investigates whether highway segments exposed to extreme weather ev
     * Wind-related events are negatively correlated with crashes, indicating that more wind on the highway is associated with fewer crashes.
     * 'Niederschlag' (precipitation) shows a positive correlation, meaning that more precipitation leads to more crashes.
 
+## Conclusion Part 2
 3. Random Forest Regressor:
     * 'Black Ice' and 'Windböen' are the most important weather factors for predicting crash likelihood.
     * None of the features stand out significantly in predicting crash likelihood.
@@ -338,10 +296,12 @@ The analysis investigates whether highway segments exposed to extreme weather ev
 5. Analysis of Snow Conditions:
     * Areas with more snow tend to have more crashes, but the correlation is not strong.
 
+## Conclusion Part 3
 6. Analysis of A8 Route (Karlsruhe - Munich):
     * The A8 route shows a relatively high occurrence of crashes.
     * Contrary to expectations, areas with more severe weather events on this route have fewer crashes.
     * There is a negative correlation between weather events and crashes on this particular route.
     * Weather events may not be the primary cause of crashes on the A8 route.
 
+## Summary
 In summary, the analysis does not strongly support the hypothesis that highway segments exposed to extreme weather events result in more car crashes. The correlation analysis and specific route analysis suggest that weather events may not be the main contributing factor to the observed crashes.
