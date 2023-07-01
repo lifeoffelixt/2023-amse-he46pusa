@@ -40,12 +40,6 @@ constraint TemperatureAbsoluteZero oftype RangeConstraint {
     
 }
 
-transform GeraetActiveToBoolean {
-  from GeraetActiveText oftype text;
-  to GeraetActiveBoolean oftype boolean;
-
-  GeraetActiveBoolean: GeraetActiveText == "Ja";
-}
 
 pipeline Temperatures {
 
@@ -94,8 +88,8 @@ pipeline Temperatures {
 			"Hersteller" oftype text,
 			"Model" oftype text,
 			"Monat" oftype Month,
-			"Temperatur" oftype Temperatur,
-			"Batterietemperatur" oftype Temperatur,
+			"Temperatur" oftype decimal,
+			"Batterietemperatur" oftype decimal,
 			"Geraet aktiv" oftype text
 		];
 	}
