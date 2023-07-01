@@ -15,6 +15,31 @@ constraint GeraetOverZero oftype RangeConstraint {
   lowerBound: 0;    
 }
 
+valuetype Month oftype decimal {
+    constraints: [
+        MonthRange,
+    ];
+}
+
+constraint MonthRange oftype RangeConstraint {
+  lowerBound: 1;
+  lowerBoundInclusive: true;
+  upperBound: 12; 
+  upperBoundInclusive: true;     
+}
+
+valuetype Temperatur oftype decimal {
+    constraints: [
+        TemperatureAbsoluteZero,
+    ];
+}
+
+constraint TemperatureAbsoluteZero oftype RangeConstraint {
+  lowerBound: -273.150;
+  lowerBoundInclusive: true;
+    
+}
+
 transform GeraetActiveToBoolean {
   from GeraetActiveText oftype text;
   to GeraetActiveBoolean oftype boolean;
@@ -68,9 +93,9 @@ pipeline Temperatures {
 			"Geraet" oftype Geraet,
 			"Hersteller" oftype text,
 			"Model" oftype text,
-			"Monat" oftype integer,
-			"Temperatur" oftype decimal,
-			"Batterietemperatur" oftype decimal,
+			"Monat" oftype Month,
+			"Temperatur" oftype Temperatur,
+			"Batterietemperatur" oftype Temperatur,
 			"Geraet aktiv" oftype text
 		];
 	}
