@@ -5,7 +5,7 @@ transform CelsiusToFahrenheit {
   tempFahrenheit: (tempCelsius * 9/5) + 32;
 }
 
-valuetype Geraet oftype decimal {
+valuetype Geraet oftype integer {
     constraints: [
         GeraetOverZero,
     ];
@@ -15,7 +15,7 @@ constraint GeraetOverZero oftype RangeConstraint {
   lowerBound: 0;    
 }
 
-valuetype Month oftype decimal {
+valuetype Month oftype integer {
     constraints: [
         MonthRange,
     ];
@@ -87,7 +87,7 @@ pipeline Temperatures {
 			"Geraet" oftype Geraet,
 			"Hersteller" oftype text,
 			"Model" oftype text,
-			"Monat" oftype integer,
+			"Monat" oftype Month,
 			"Temperatur" oftype decimal,
 			"Batterietemperatur" oftype decimal,
 			"Geraet aktiv" oftype text
