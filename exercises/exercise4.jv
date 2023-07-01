@@ -88,8 +88,8 @@ pipeline Temperatures {
 			"Hersteller" oftype text,
 			"Model" oftype text,
 			"Monat" oftype Month,
-			"Temperatur" oftype decimal,
-			"Batterietemperatur" oftype decimal,
+			"Temperatur" oftype Temperatur,
+			"Batterietemperatur" oftype Temperatur,
 			"Geraet aktiv" oftype text
 		];
 	}
@@ -125,4 +125,3 @@ pipeline Temperatures {
         -> CelsiusToFahrenheitBatteryTemperaturesTransformer
         -> TemperaturesLoader;
 }
-
