@@ -1,9 +1,8 @@
 import urllib.request
 import zipfile
 import csv
-from sqlalchemy import create_engine, Column, String, Float, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import pandas as pd
+from sqlalchemy import create_engine, Text, Float, Integer
 
 # Download the GTFS data
 url = 'https://gtfs.rhoenenergie-bus.de/GTFS.zip'
@@ -12,10 +11,6 @@ urllib.request.urlretrieve(url, 'GTFS.zip')
 # Extract the ZIP file
 with zipfile.ZipFile('GTFS.zip', 'r') as zip_ref:
     zip_ref.extractall('GTFS')
-
-# Define the desired columns and their data types
-desired_columns = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'zone_id']
-desired_data_types = [Integer, String, Float, Float, Integer]
 
 # Filter and validate the data
 filtered_data = []
@@ -28,40 +23,29 @@ with open('GTFS/stops.txt', 'r', encoding='utf-8-sig') as csv_file:
             and -90 <= float(row['stop_lat']) <= 90
             and -90 <= float(row['stop_lon']) <= 90
         ):
-            filtered_data.append(row)
+            filtered_data.append({
+                'stop_id': row['stop_id'],
+                'stop_name': row['stop_name'],
+                'stop_lat': float(row['stop_lat']),
+                'stop_lon': float(row['stop_lon']),
+                'zone_id': int(row['zone_id'])
+            })
 
-# Create the SQLite database and table using SQLAlchemy
-Base = declarative_base()
+# Convert filtered_data to a DataFrame
+df = pd.DataFrame(filtered_data)
 
+# Define SQLite types for each column
+sqlite_types = {
+    'stop_id': Integer(),
+    'stop_name': Text(),
+    'stop_lat': Float(),
+    'stop_lon': Float(),
+    'zone_id': Integer()
+}
 
-class Stop(Base):
-    __tablename__ = 'stops'
-    stop_id = Column(Integer)
-    stop_name = Column(String)
-    stop_lat = Column(Float)
-    stop_lon = Column(Float)
-    zone_id = Column(Integer)
-
-
-# Create the database engine and session
 engine = create_engine('sqlite:///gtfs.sqlite')
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
-# Insert the filtered data into the stops table
-for row in filtered_data:
-    stop = Stop(
-        stop_id=row['stop_id'],
-        stop_name=row['stop_name'],
-        stop_lat=float(row['stop_lat']),
-        stop_lon=float(row['stop_lon']),
-        zone_id=int(row['zone_id'])
-    )
-    session.add(stop)
+df.to_sql('stops', engine, if_exists='replace', index=False, dtype=sqlite_types)
 
-# Commit the changes and close the session
-session.commit()
-session.close()
-
-print("Data pipeline completed successfully!")
+# Close the database connection
+engine.dispose()
