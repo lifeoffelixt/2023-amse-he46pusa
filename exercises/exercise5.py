@@ -1,7 +1,7 @@
 import urllib.request
 import zipfile
 import csv
-from sqlalchemy import create_engine, Column, String, Float, BigInteger
+from sqlalchemy import create_engine, Column, String, Float, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -15,7 +15,7 @@ with zipfile.ZipFile('GTFS.zip', 'r') as zip_ref:
 
 # Define the desired columns and their data types
 desired_columns = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'zone_id']
-desired_data_types = [String, String, Float, Float, BigInteger]
+desired_data_types = [Integer, String, Float, Float, Integer]
 
 # Filter and validate the data
 filtered_data = []
@@ -36,11 +36,11 @@ Base = declarative_base()
 
 class Stop(Base):
     __tablename__ = 'stops'
-    stop_id = Column(String, primary_key=True)
+    stop_id = Column(Integer)
     stop_name = Column(String)
     stop_lat = Column(Float)
     stop_lon = Column(Float)
-    zone_id = Column(BigInteger)
+    zone_id = Column(Integer)
 
 
 # Create the database engine and session
