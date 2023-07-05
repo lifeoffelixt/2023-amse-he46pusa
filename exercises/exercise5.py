@@ -20,7 +20,7 @@ with open('GTFS/stops.txt', 'r', encoding='utf-8-sig') as csv_file:
     for row in csv_reader:
         if (
             row['zone_id'] == '2001'
-            #and row['stop_name'].isascii()
+            and all(ord(c) < 128 for c in row['stop_name'])
             and -90 <= float(row['stop_lat']) <= 90
             and -90 <= float(row['stop_lon']) <= 90
         ):
