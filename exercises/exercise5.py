@@ -3,6 +3,7 @@ import zipfile
 import csv
 import pandas as pd
 from sqlalchemy import create_engine, Text, Float, Integer
+import re
 
 # Download the GTFS data
 url = 'https://gtfs.rhoenenergie-bus.de/GTFS.zip'
@@ -14,13 +15,15 @@ with zipfile.ZipFile('GTFS.zip', 'r') as zip_ref:
 
 # Filter and validate the data
 filtered_data = []
+german_umlauts_regex = r'[äöüÄÖÜß]'
 with open('GTFS/stops.txt', 'r', encoding='utf-8-sig') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     
     for row in csv_reader:
+        stop_name = row['stop_name']
         if (
             row['zone_id'] == '2001'
-            and row['stop_name'].isascii()
+            and re.search(german_umlauts_regex, stop_name)
             and -90 <= float(row['stop_lat']) <= 90
             and -90 <= float(row['stop_lon']) <= 90
         ):
