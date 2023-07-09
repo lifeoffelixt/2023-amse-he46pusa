@@ -15,7 +15,6 @@ with zipfile.ZipFile('GTFS.zip', 'r') as zip_ref:
 
 # Filter and validate the data
 filtered_data = []
-german_umlauts_regex = r'[äöüÄÖÜß]'
 with open('GTFS/stops.txt', 'r', encoding='utf-8-sig') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     
@@ -23,7 +22,6 @@ with open('GTFS/stops.txt', 'r', encoding='utf-8-sig') as csv_file:
         stop_name = row['stop_name']
         if (
             row['zone_id'] == '2001'
-            and re.search(german_umlauts_regex, stop_name)
             and -90 <= float(row['stop_lat']) <= 90
             and -90 <= float(row['stop_lon']) <= 90
         ):
