@@ -123,12 +123,16 @@ def save_image(fig, name):
 
 ![Map of all the routes](images/Strecke.png){width='80%'}
 
-## Crashes of all routes
+## Crashes/Weather of all routes
 
-![Map of all the crashes](images/Crash.png){width='80%'}
+::: {layout-ncol=2}
 
-## Weather of all routes
-![Map of all the crashes](images/Weather.png){width='80%'}
+![Map of all the crashes](images/Crash.png){width='30%'}
+
+![Map of all the crashes](images/Weather.png){width='30%'}
+
+:::
+
 
 
  
@@ -154,14 +158,13 @@ list(top_weather_phenomena)
 
 ## Analysis of crashes during precipitation
 
+::: {layout-ncol=2}
 
-![Map of all the crashe in the wet](images/CrashWet.png){width='80%'}
+![Map of all the crashes in the wet](images/CrashWet.png){width='30%'}
 
-## Precipitation Map
+![Map of precipation](images/Weather.png){width='30%'}
 
-![Map of all the crashe in the wet](images/Precipitation.png){width='80%'}
-
-
+:::
 
 ## Correlation Analysis of wet weather crashes
 
