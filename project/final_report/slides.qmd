@@ -82,7 +82,7 @@ def correlationPlot(df, columns_to_exclude, title):
   corr_matrix = df[selected_columns].corr()
 
   # Plot the correlation matrix
-  plt.figure(figsize=(10, 8))
+  plt.figure(figsize=(6, 4))
   sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
   plt.title(title)
   return plt, corr_matrix
@@ -108,7 +108,7 @@ def save_image(fig, name):
 
 1. Preporcessing of the weather data
     * Give each weather measure point a unique ID
-    * As the measure points are distributed one kilometer apart from each other, each points gets an kilomter marker
+    * As the measure points are distributed one kilometer apart from each other, each points gets an kilometer marker
 2. Preprocessing of the crash data
     * Dropping rows with irrelevant data (turn accidents, bike accidents, etc.)
     * Drop columns with irrelevant data
@@ -117,7 +117,11 @@ def save_image(fig, name):
       + Drop rows where no point is within the treshold
       + If there are multiple points within the treshold, select the one closest
     * Merge crash data to the weather data
-4. Normalize the combined data per Route
+4. Normalize the combined data
+
+## Overview of all routes
+
+![Map of all the routes](images/Strecke.png){width='80%'}
 
 ## Crashes of all routes
 
@@ -148,30 +152,6 @@ top_weather_phenomena = highest_corr.index[1:]
 list(top_weather_phenomena)
 ```
 
-
-
-## Conclusion
-The analysis investigates whether highway segments exposed to extreme weather events lead to more car crashes. Here are the key findings:
-
-1. Initial Analysis:
-    * The number of crashes is higher in the south of Germany, where severe weather events also occur more frequently.
-
-2. Correlation Analysis:
-    * The correlation between the number of crashes and weather events is not strong.
-    * Wind-related events are negatively correlated with crashes, indicating that more wind on the highway is associated with fewer crashes.
-    * 'Niederschlag' (precipitation) shows a positive correlation, meaning that more precipitation leads to more crashes.
-
-## Conclusion Part 2
-3. Analysis of Wet Conditions:
-    * Areas with more precipitation tend to have more crashes, but the correlation is not strong.
-
-4. Analysis of Snow Conditions:
-    * Areas with more snow tend to have more crashes, but the correlation is not strong.
-
-
-## Summary
-In summary, the analysis does not strongly support the hypothesis that highway segments exposed to extreme weather events result in more car crashes. The correlation analysis and specific route analysis suggest that weather events may not be the main contributing factor to the observed crashes.
-
 ## Analysis of crashes during precipitation
 
 
@@ -201,22 +181,20 @@ top_weather_phenomena = highest_corr.index[1:]
 list(top_weather_phenomena)
 ```
 
-## Analysis of crashes due to snow
 
+## Conclusion
+The analysis investigates whether highway segments exposed to extreme weather events lead to more car crashes. Here are the key findings:
 
-![Map of all the crashe in the snow](images/CrashSnow.png){width='80%'}
+1. Initial Analysis:
+    * The number of crashes is higher in the south of Germany, where severe weather events also occur more frequently.
 
-## Snow Map
+2. Correlation Analysis:
+    * The correlation between the number of crashes and weather events is not strong.
+    * Wind-related events are negatively correlated with crashes, indicating that more wind on the highway is associated with fewer crashes.
+    * 'Niederschlag' (precipitation) shows a positive correlation, meaning that more precipitation leads to more crashes.
 
-![Map of snow](images/Snow.png){width='80%'}
+3. Analysis of Wet Conditions:
+    * Areas with more precipitation tend to have more crashes, but the correlation is not strong.
 
-
-## Correlation Analysis
-
-```{python}
-# List of columns to exclude from correlation calculation
-columns_to_exclude = ['index','Strecke', 'StreckeID', 'Kilometer', 'Count', 'CrashCount', 'CrashCountWet', 'CrashCountSnow', 'CrashCountWetSnow','Latitude', 'Longitude', 'NormalizedCrash', 'NormalizedCrashWet', 'NormalizedCrashWetSnow']  # Add the column names you want to exclude
-
-plt, corr_matrix = correlationPlot(data, columns_to_exclude, 'Correlation Matrix of snow crashes')
-plt.show()
-```
+## Summary
+In summary, the analysis does not strongly support the hypothesis that highway segments exposed to extreme weather events result in more car crashes. The correlation analysis suggest that weather events may not be the main contributing factor to the observed crashes.
