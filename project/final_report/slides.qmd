@@ -162,7 +162,7 @@ list(top_weather_phenomena)
 
 ![Map of all the crashes in the wet](images/CrashWet.png){width='30%'}
 
-![Map of precipation](images/Weather.png){width='30%'}
+![Map of precipation](images/Precipitation.png.png){width='30%'}
 
 :::
 

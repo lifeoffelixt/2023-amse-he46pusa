@@ -38,7 +38,7 @@ It analyses whether highway segments that are particularly exposed to extreme we
 
 1. Preporcessing of the weather data
     * Give each weather measure point a unique ID
-    * As the measure points are distributed one kilometer apart from each other, each points gets an kilomter marker
+    * As the measure points are distributed one kilometer apart from each other, each points gets an kilometer marker
 2. Preprocessing of the crash data
     * Dropping rows with irrelevant data (turn accidents, bike accidents, etc.)
     * Drop columns with irrelevant data
@@ -47,7 +47,7 @@ It analyses whether highway segments that are particularly exposed to extreme we
       + Drop rows where no point is within the treshold
       + If there are multiple points within the treshold, select the one closest
     * Merge crash data to the weather data
-4. Normalize the combined data per Route
+4. Normalize the combined data
 
 ## Analysis
 
